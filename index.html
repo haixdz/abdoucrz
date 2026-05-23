@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدونة abdoucrz - تحميل أفضل التطبيقات والألعاب</title>
+    
+    <!-- كود التحقق السريع من Google AdSense (انسخ المعرف الخاص بك وضعه بدلا من X إذا أردت تسريع المراجعة يدويا) -->
+    <!-- <meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXX"> -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- استدعاء Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#0ea5e9', // لون أزرق مميز للأزرار والروابط
+                        dark: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* تأثيرات إضافية بسيطة */
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- شريط التنقل العلوي (Header) -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20"> <!-- تم تكبير ارتفاع الهيدر قليلا ليناسب الشعار -->
+                <!-- الشعار (Logo) -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="flex items-center hover:opacity-80 transition-opacity">
+                        <!-- تم تكبير الشعار هنا (h-12 بدلا من h-8) -->
+                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-12 md:h-14 object-contain">
+                    </a>
+                </div>
+
+                <!-- القائمة الرئيسية (لأجهزة الكمبيوتر) -->
+                <nav class="hidden md:flex space-x-8 space-x-reverse items-center">
+                    <a href="index.html" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-house"></i> الرئيسية</a>
+                    <a href="index.html?category=تطبيقات" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> تطبيقات</a>
+                    <a href="index.html?category=ألعاب" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-gamepad"></i> ألعاب</a>
+                    <a href="index.html?category=مواقع" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-globe"></i> مواقع</a>
+                    <a href="index.html?category=أخبار تقنية" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-newspaper"></i> أخبار تقنية</a>
+                </nav>
+
+                <!-- قسم البحث وزر الانضمام -->
+                <div class="hidden md:flex items-center gap-4">
+                    <!-- زر الوضع الليلي -->
+                    <button id="theme-toggle" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-lg p-2 transition-colors">
+                        <i id="theme-toggle-dark-icon" class="fa-solid fa-moon hidden"></i>
+                        <i id="theme-toggle-light-icon" class="fa-solid fa-sun hidden"></i>
+                    </button>
+
+                    <div class="relative">
+                        <input type="text" placeholder="ابحث عن لعبة أو تطبيق..." class="bg-gray-100 text-sm rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <!-- تم حذف زر الانضمام للمبدعين نهائياً من هنا -->
+                </div>
+
+                <!-- زر القائمة للهواتف (تم إضافة الـ ID هنا ليعمل الزر) -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-primary focus:outline-none text-2xl transition-colors">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- القائمة الجانبية للهواتف (Mobile Sidebar) - هذا الجزء كان مفقوداً -->
+    <div id="mobile-sidebar" class="fixed inset-0 z-50 hidden">
+        <!-- خلفية مظلمة (Overlay) -->
+        <div id="mobile-sidebar-overlay" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity opacity-0"></div>
+        
+        <!-- القائمة نفسها -->
+        <nav id="mobile-sidebar-content" class="absolute top-0 right-0 bottom-0 w-64 bg-white dark:bg-gray-800 shadow-xl transform translate-x-full transition-transform duration-300 flex flex-col">
+            <div class="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-700">
+                <a href="index.html" class="flex items-center">
+                    <!-- تم تكبير الشعار في قائمة الهاتف -->
+                    <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-10 object-contain">
+                </a>
+                <button id="close-mobile-menu" class="text-gray-500 hover:text-red-500 text-2xl focus:outline-none transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-2 px-4">
+                <a href="index.html" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-house text-primary"></i> الرئيسية</a>
+                <a href="index.html?category=تطبيقات" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-mobile-screen text-primary"></i> تطبيقات</a>
+                <a href="index.html?category=ألعاب" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-gamepad text-primary"></i> ألعاب</a>
+                <a href="index.html?category=مواقع" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-globe text-primary"></i> مواقع</a>
+                <a href="index.html?category=أخبار تقنية" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-newspaper text-primary"></i> أخبار تقنية</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- مساحة إعلانية علوية مجهزة لـ Google AdSense -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 flex justify-center items-center text-gray-400 dark:text-gray-500 text-sm min-h-[100px] border border-gray-200 dark:border-gray-700 transition-colors">
+            <span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> مساحة إعلانية علوية (AdSense)</span>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        
+        <!-- مساحة إعلانية إضافية وسطية (جديدة لزيادة الأرباح) -->
+        <div class="mb-10 w-full hidden md:block">
+            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[120px] border border-dashed border-gray-300 dark:border-gray-700">
+                <span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> مساحة إعلانية وسطية (AdSense)</span>
+            </div>
+        </div>
+
+        <!-- حاوية المقالات (تم إصلاح المعرّف المفقود هنا) -->
+        <div id="articles-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            
+            <!-- رسالة تحميل تظهر حتى يتم جلب البيانات -->
+            <div class="col-span-full text-center py-12">
+                <i class="fa-solid fa-spinner fa-spin text-4xl text-primary mb-4"></i>
+                <p class="text-gray-500 font-semibold">جاري جلب المقالات من قاعدة البيانات...</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- الفوتر (Footer) - مهم جداً للقبول في أدسنس -->
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 pt-8 pb-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <!-- حقوق النشر والشعار -->
+                <div class="flex flex-col items-center md:items-start">
+                    <a href="index.html" class="mb-4 hover:opacity-80 transition-opacity">
+                        <!-- تم تكبير الشعار في الفوتر بقوة -->
+                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-14 md:h-16 object-contain">
+                    </a>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">© 2026 جميع الحقوق محفوظة لمدونة abdoucrz.</p>
+                </div>
+
+                <!-- الصفحات الإلزامية (AdSense) -->
+                <div class="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400 font-semibold">
+                    <a href="page.html?type=privacy" class="hover:text-primary dark:hover:text-primary transition-colors">سياسة الخصوصية</a>
+                    <a href="page.html?type=terms" class="hover:text-primary dark:hover:text-primary transition-colors">شروط الاستخدام</a>
+                    <a href="page.html?type=contact" class="hover:text-primary dark:hover:text-primary transition-colors">اتصل بنا</a>
+                    <a href="page.html?type=about" class="hover:text-primary dark:hover:text-primary transition-colors">من نحن</a>
+                </div>
+
+                <!-- منصات التواصل -->
+                <div class="flex gap-4">
+                    <a id="social-fb" href="#" class="text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary text-xl transition-colors"><i class="fa-brands fa-facebook"></i></a>
+                    <a id="social-tw" href="#" class="text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary text-xl transition-colors"><i class="fa-brands fa-twitter"></i></a>
+                    <a id="social-ig" href="#" class="text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary text-xl transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                    <a id="social-tg" href="#" class="text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary text-xl transition-colors"><i class="fa-brands fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- نافذة الموافقة على ملفات تعريف الارتباط (الكوكيز) لـ AdSense -->
+    <div id="cookie-banner" class="fixed bottom-0 inset-x-0 pb-2 sm:pb-5 z-50 hidden transition-transform transform translate-y-full duration-500">
+        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="p-3 rounded-lg bg-gray-900 shadow-2xl sm:p-4 border border-gray-700">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="w-0 flex-1 flex items-center">
+                        <span class="flex p-2 rounded-lg bg-gray-800">
+                            <i class="fa-solid fa-cookie-bite text-yellow-500 text-xl"></i>
+                        </span>
+                        <p class="ml-3 font-medium text-white text-sm px-3 leading-relaxed border-l border-gray-700">
+                            <span class="md:hidden">نستخدم الكوكيز لتحسين تجربتك وتخصيص الإعلانات.</span>
+                            <span class="hidden md:inline">هذا الموقع يستخدم ملفات تعريف الارتباط (Cookies) لضمان حصولك على أفضل تجربة على موقعنا، ولتخصيص إعلانات Google AdSense.</span>
+                        </p>
+                    </div>
+                    <div class="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto flex gap-3">
+                        <a href="page.html?type=privacy" class="flex items-center justify-center px-4 py-2 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-300 bg-transparent hover:bg-gray-800 transition-colors">سياسة الخصوصية</a>
+                        <button id="accept-cookies" class="flex items-center justify-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-primary hover:bg-blue-600 transition-colors">أوافق</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
+            authDomain: "abdoucrz-dd234.firebaseapp.com",
+            projectId: "abdoucrz-dd234",
+            storageBucket: "abdoucrz-dd234.firebasestorage.app",
+            messagingSenderId: "305213328928",
+            appId: "1:305213328928:web:47136d037fbe88002af645",
+            measurementId: "G-8WF00TW430"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'abdoucrz_blog';
+
+        signInAnonymously(auth).then(() => {
+            // --- جلب إعدادات SEO وأدسنس ديناميكياً وحقنها في رأس الصفحة ---
+            const seoDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo');
+            getDoc(seoDocRef).then((seoSnap) => {
+                if (seoSnap.exists()) {
+                    const seoData = seoSnap.data();
+                    // إضافة وصف الموقع
+                    if (seoData.description) {
+                        let metaDesc = document.createElement('meta');
+                        metaDesc.name = "description";
+                        metaDesc.content = seoData.description;
+                        document.head.appendChild(metaDesc);
+                    }
+                    // إضافة الكلمات المفتاحية
+                    if (seoData.keywords) {
+                        let metaKeywords = document.createElement('meta');
+                        metaKeywords.name = "keywords";
+                        metaKeywords.content = seoData.keywords;
+                        document.head.appendChild(metaKeywords);
+                    }
+                    // دمج كود جوجل أدسنس تلقائياً
+                    if (seoData.adsenseId) {
+                        // إضافة وسم التحقق (Meta Tag) برمجياً لضمان قبول المراجعة
+                        let adsenseMeta = document.createElement('meta');
+                        adsenseMeta.name = "google-adsense-account";
+                        adsenseMeta.content = seoData.adsenseId;
+                        document.head.appendChild(adsenseMeta);
+
+                        let adsenseScript = document.createElement('script');
+                        adsenseScript.async = true;
+                        adsenseScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${seoData.adsenseId}`;
+                        adsenseScript.crossOrigin = "anonymous";
+                        document.head.appendChild(adsenseScript);
+                    }
+
+                    // دمج كود Google Analytics تلقائياً لتتبع الزوار (تمت إضافة المعرف الخاص بك افتراضياً هنا)
+                    const finalAnalyticsId = seoData.analyticsId || "G-8WF00TW430";
+                    if (finalAnalyticsId) {
+                        let gaScript = document.createElement('script');
+                        gaScript.async = true;
+                        gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${finalAnalyticsId}`;
+                        document.head.appendChild(gaScript);
+
+                        let gaInlineScript = document.createElement('script');
+                        gaInlineScript.innerHTML = `
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', '${finalAnalyticsId}');
+                        `;
+                        document.head.appendChild(gaInlineScript);
+                    }
+
+                    // تحديث روابط التواصل الاجتماعي في الفوتر
+                    if (seoData.facebookUrl) document.getElementById('social-fb').href = seoData.facebookUrl;
+                    if (seoData.twitterUrl) document.getElementById('social-tw').href = seoData.twitterUrl;
+                    if (seoData.instagramUrl) document.getElementById('social-ig').href = seoData.instagramUrl;
+                    if (seoData.telegramUrl) document.getElementById('social-tg').href = seoData.telegramUrl;
+                }
+            }).catch(err => console.error("Error loading SEO:", err));
+
+            const articlesContainer = document.getElementById('articles-container');
+            
+            // --- إضافة أزرار التصنيفات (الفلتر) وقراءة الرابط ---
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedCategory = urlParams.get('category');
+            
+            const filterHTML = `
+                <div class="flex flex-wrap gap-2 mb-8 justify-center" id="category-filters">
+                    <a href="index.html" class="px-5 py-2 rounded-full ${!selectedCategory ? 'bg-primary text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm'} border border-gray-200 dark:border-gray-700 hover:bg-primary hover:text-white font-bold text-sm transition-all duration-300">الكل</a>
+                    <a href="index.html?category=تطبيقات" class="px-5 py-2 rounded-full ${selectedCategory === 'تطبيقات' ? 'bg-primary text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm'} border border-gray-200 dark:border-gray-700 hover:bg-primary hover:text-white font-bold text-sm transition-all duration-300">تطبيقات</a>
+                    <a href="index.html?category=ألعاب" class="px-5 py-2 rounded-full ${selectedCategory === 'ألعاب' ? 'bg-primary text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm'} border border-gray-200 dark:border-gray-700 hover:bg-primary hover:text-white font-bold text-sm transition-all duration-300">ألعاب</a>
+                    <a href="index.html?category=مواقع" class="px-5 py-2 rounded-full ${selectedCategory === 'مواقع' ? 'bg-primary text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm'} border border-gray-200 dark:border-gray-700 hover:bg-primary hover:text-white font-bold text-sm transition-all duration-300">مواقع</a>
+                    <a href="index.html?category=أخبار تقنية" class="px-5 py-2 rounded-full ${selectedCategory === 'أخبار تقنية' ? 'bg-primary text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm'} border border-gray-200 dark:border-gray-700 hover:bg-primary hover:text-white font-bold text-sm transition-all duration-300">أخبار تقنية</a>
+                </div>
+            `;
+            
+            // إدراج الأزرار فوق المقالات إذا لم تكن موجودة
+            if(!document.getElementById('category-filters-container')) {
+                const filtersContainer = document.createElement('div');
+                filtersContainer.id = 'category-filters-container';
+                filtersContainer.innerHTML = filterHTML;
+                articlesContainer.parentNode.insertBefore(filtersContainer, articlesContainer);
+            }
+
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
+            onSnapshot(q, (snapshot) => {
+                articlesContainer.innerHTML = '';
+                
+                const articles = [];
+                snapshot.forEach(doc => {
+                    articles.push({ id: doc.id, ...doc.data() });
+                });
+                
+                articles.sort((a, b) => {
+                    const timeA = a.createdAt?.seconds || 0;
+                    const timeB = b.createdAt?.seconds || 0;
+                    return timeB - timeA;
+                });
+
+                let displayCount = 0;
+
+                // كود عرض المقالات مع تطبيق الفلترة
+                articles.forEach((article, index) => {
+                    // فلترة المقال بناءً على التصنيف المختار
+                    if (selectedCategory && article.category !== selectedCategory) {
+                        return; // تخطي المقال وإخفاؤه
+                    }
+                    
+                    displayCount++;
+
+                    const articleHTML = `
+                        <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300 flex flex-col h-full group">
+                            <a href="article.html?id=${article.id}" class="flex flex-col h-full">
+                                <div class="relative overflow-hidden aspect-video">
+                                    <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600'">
+                                    <span class="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-primary font-bold text-xs px-3 py-1 rounded-full shadow-sm">${article.category}</span>
+                                </div>
+                                <div class="p-5 flex flex-col flex-1">
+                                    <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">${article.title}</h3>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
+                                        ${article.content ? article.content.replace(/<[^>]*>?/gm, '').substring(0, 90) + '...' : 'تطبيق رائع يوفر العديد من الميزات الحصرية...'}
+                                    </p>
+                                    <div class="flex items-center justify-between text-xs text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fa-solid fa-download text-primary"></i>
+                                            <span dir="ltr">${article.downloads || '+10,000'}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-yellow-500">
+                                            <i class="fa-solid fa-star"></i>
+                                            <span>${article.rating || '4.5'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+                    `;
+                    articlesContainer.innerHTML += articleHTML;
+
+                    // إضافة بطاقة إعلانية بعد كل 3 مقالات معروضة فعلياً
+                    if (displayCount % 3 === 0 && index !== articles.length - 1) {
+                        const infeedAdHTML = `
+                            <article class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col justify-center items-center h-full min-h-[250px] text-gray-400 transition-colors">
+                                <span class="text-[10px] mb-2 font-semibold">إعلان مدمج - In-Feed Ad</span>
+                                <i class="fa-solid fa-rectangle-ad text-4xl text-gray-300 dark:text-gray-600"></i>
+                            </article>
+                        `;
+                        articlesContainer.innerHTML += infeedAdHTML;
+                    }
+                });
+
+                // إظهار رسالة إذا كان القسم فارغاً
+                if (displayCount === 0) {
+                    articlesContainer.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 text-lg font-bold">لا توجد مقالات في هذا القسم حالياً.</div>';
+                }
+                
+            }, (error) => {
+                // إظهار الخطأ بوضوح على الشاشة إن وجد
+                console.error("خطأ", error);
+                articlesContainer.innerHTML = '<div class="col-span-full text-center py-10 text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> خطأ في جلب البيانات من قاعدة البيانات: <br>' + error.message + '</div>';
+            });
+        }).catch(err => {
+            // إظهار خطأ المصادقة على الشاشة
+            console.error(err);
+            document.getElementById('articles-container').innerHTML = '<div class="col-span-full text-center py-10 text-red-500 font-bold"><i class="fa-solid fa-user-lock"></i> خطأ في تسجيل الدخول (Auth): <br>' + err.message + '</div>';
+        });
+
+        // تشغيل نافذة الكوكيز (Cookie Consent)
+        document.addEventListener('DOMContentLoaded', () => {
+            const cookieBanner = document.getElementById('cookie-banner');
+            const acceptBtn = document.getElementById('accept-cookies');
+            
+            // التحقق مما إذا كان الزائر قد وافق مسبقاً
+            if (!localStorage.getItem('cookiesAccepted')) {
+                cookieBanner.classList.remove('hidden');
+                // تأثير دخول ناعم من الأسفل
+                setTimeout(() => cookieBanner.classList.remove('translate-y-full'), 100);
+            }
+            
+            acceptBtn.addEventListener('click', () => {
+                localStorage.setItem('cookiesAccepted', 'true');
+                cookieBanner.classList.add('translate-y-full');
+                setTimeout(() => cookieBanner.classList.add('hidden'), 500);
+            });
+
+            // --- نظام القائمة الجانبية للهواتف ---
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const closeMobileMenuBtn = document.getElementById('close-mobile-menu');
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
+            const mobileSidebarContent = document.getElementById('mobile-sidebar-content');
+            
+            function openMobileMenu() {
+                mobileSidebar.classList.remove('hidden');
+                // تأخير بسيط للسماح للمتصفح برسم العنصر قبل بدء الحركة
+                setTimeout(() => {
+                    mobileSidebarOverlay.classList.remove('opacity-0');
+                    mobileSidebarContent.classList.remove('translate-x-full');
+                }, 10);
+            }
+
+            function closeMobileMenu() {
+                mobileSidebarOverlay.classList.add('opacity-0');
+                mobileSidebarContent.classList.add('translate-x-full');
+                setTimeout(() => {
+                    mobileSidebar.classList.add('hidden');
+                }, 300); // يتوافق مع مدة الحركة (300ms)
+            }
+
+            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+            if (closeMobileMenuBtn) closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+            if (mobileSidebarOverlay) mobileSidebarOverlay.addEventListener('click', closeMobileMenu);
+
+        });
+    </script>
+</body>
+</html>

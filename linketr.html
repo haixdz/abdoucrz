@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Abdoucrz | روابط حصرية</title>
+    
+    <!-- الخطوط والأيقونات -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- إطار العمل Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: { primary: '#0ea5e9', dark: '#1e293b', bgLight: '#f3f4f6' }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* إضافة تأثير الدخول الحركي (Entrance Animation) */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.6s ease forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-[#f2f2f2] dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans antialiased min-h-screen flex flex-col items-center py-10 transition-colors duration-300">
+
+    <!-- حاوية الصفحة الرئيسية -->
+    <main class="w-full max-w-lg px-4 flex flex-col gap-6 relative">
+        
+        <!-- الأزرار العلوية (مشاركة + إعدادات/مظهر) -->
+        <div class="flex justify-between items-center w-full absolute top-0 left-0 px-4">
+            <!-- زر النجمة (يسار) -->
+            <button id="theme-toggle" class="w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-sm flex items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-105 transition-transform">
+                <i class="fa-solid fa-asterisk text-lg"></i>
+            </button>
+            
+            <!-- زر المشاركة (يمين) -->
+            <button onclick="shareProfile()" class="w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-sm flex items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-105 transition-transform">
+                <i class="fa-solid fa-arrow-up-from-bracket text-lg"></i>
+            </button>
+        </div>
+
+        <!-- رأس الصفحة (الصورة + الاسم + البايو) -->
+        <header class="flex flex-col items-center mt-6 mb-4">
+            <!-- صورة الملف الشخصي -->
+            <div class="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden shadow-lg border-2 border-white dark:border-gray-800 mb-4">
+                <img id="bio-profile-img" src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=300&h=300&fit=crop" alt="Abdoucrz Profile" class="w-full h-full object-cover">
+            </div>
+            
+            <!-- الاسم مع علامة التوثيق الزرقاء -->
+            <h1 class="text-2xl md:text-3xl font-extrabold mb-1 flex items-center justify-center gap-1.5">
+                <span id="bio-profile-name">@Abdoucrz</span>
+                <i class="fa-solid fa-circle-check text-blue-500 text-[20px]" title="حساب رسمي وموثق"></i>
+            </h1>
+            
+            <!-- الوصف (البايو) -->
+            <p id="bio-profile-desc" class="text-center text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300 max-w-xs leading-relaxed">
+                Tech Simplified • Apps, AI & Smart Hacks — Notre histoire, on l'écrit.
+            </p>
+        </header>
+
+        <!-- قائمة الروابط (تم تحويلها لتعمل برمجياً) -->
+        <div id="links-container" class="flex flex-col gap-4 w-full mt-2">
+            
+            <!-- شاشة التحميل -->
+            <div class="text-center py-8 text-gray-500">
+                <i class="fa-solid fa-spinner fa-spin text-3xl mb-2 text-primary"></i>
+                <p class="font-bold">جاري تحميل الروابط...</p>
+            </div>
+            
+        </div>
+
+        <!-- حقوق مدونة abdoucrz -->
+        <div class="mt-8 text-center pb-8">
+            <a href="index.html" class="inline-block hover:opacity-80 transition-opacity">
+                <!-- تم تكبير الشعار وجعله واضحاً جداً في الوضع الداكن -->
+                <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-10 md:h-12 object-contain mx-auto brightness-0 dark:invert opacity-80 dark:opacity-100">
+            </a>
+        </div>
+    </main>
+
+    <!-- سكربت تفاعلي للمشاركة والوضع الليلي -->
+    <script>
+        // دالة المشاركة
+        function shareProfile() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '@Abdoucrz | روابط حصرية',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('تم نسخ الرابط!');
+            }
+        }
+
+        // الوضع الليلي (لأننا أضفناه في المدونة، يجب أن يكون متوفراً هنا أيضاً)
+        const themeBtn = document.getElementById('theme-toggle');
+        
+        // التحقق من الوضع الحالي (جعل الوضع الداكن هو الأساسي)
+        if (localStorage.getItem('color-theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+
+        themeBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        });
+    </script>
+    
+    <!-- برمجة جلب الروابط من قاعدة البيانات (Firebase) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, onSnapshot, orderBy, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
+            authDomain: "abdoucrz-dd234.firebaseapp.com",
+            projectId: "abdoucrz-dd234",
+            storageBucket: "abdoucrz-dd234.firebasestorage.app",
+            messagingSenderId: "305213328928",
+            appId: "1:305213328928:web:47136d037fbe88002af645"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'abdoucrz_blog';
+
+        signInAnonymously(auth).then(async () => {
+            
+            // --- جلب بيانات الحساب (البايو) ---
+            try {
+                const bioSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'bio_profile'));
+                if (bioSnap.exists()) {
+                    const bioData = bioSnap.data();
+                    if (bioData.name) document.getElementById('bio-profile-name').textContent = bioData.name;
+                    if (bioData.description) document.getElementById('bio-profile-desc').textContent = bioData.description;
+                    if (bioData.imageUrl) document.getElementById('bio-profile-img').src = bioData.imageUrl;
+                }
+            } catch (error) {
+                console.error("Error loading bio profile", error);
+            }
+
+            // ترتيب الروابط حسب الأحدث (أو العكس)
+            const linksQ = query(collection(db, 'artifacts', appId, 'public', 'data', 'biolinks'), orderBy('createdAt', 'desc'));
+            
+            onSnapshot(linksQ, (snapshot) => {
+                const container = document.getElementById('links-container');
+                container.innerHTML = '';
+                
+                let count = 0;
+                snapshot.forEach(docSnap => {
+                    count++;
+                    const data = docSnap.data();
+                    
+                    // تحديد ما إذا كان الزر يحتوي على صورة، أو أيقونة، أو نص فقط
+                    let mediaHtml = '<div class="w-12 h-12 flex-shrink-0"></div>'; // الافتراضي فارغ
+                    
+                    if (data.imageUrl && data.imageUrl.trim() !== "") {
+                        mediaHtml = `
+                            <div class="w-12 h-12 flex-shrink-0 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 bg-gray-900 flex items-center justify-center">
+                                <img src="${data.imageUrl}" alt="${data.title}" class="w-full h-full object-cover">
+                            </div>
+                        `;
+                    } else if (data.iconClass && data.iconClass.trim() !== "") {
+                        mediaHtml = `
+                            <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center text-gray-800 dark:text-white text-2xl">
+                                <i class="${data.iconClass}"></i>
+                            </div>
+                        `;
+                    }
+
+                    // تأثيرات الرابط المميز
+                    const highlightClass = data.isHighlighted ? 'border-primary ring-2 ring-primary/40 animate-[pulse_2s_ease-in-out_infinite]' : 'border-transparent dark:hover:border-gray-700';
+
+                    // توليد الزر مع تأثير الدخول (Fade Up)
+                    container.innerHTML += `
+                        <a href="${data.url}" target="_blank" rel="noopener noreferrer" data-id="${docSnap.id}" class="bio-link-item animate-fade-up group relative flex items-center justify-between w-full p-2 pr-4 bg-white dark:bg-gray-800 rounded-[20px] shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 min-h-[64px] border ${highlightClass}" style="animation-delay: ${count * 0.1}s">
+                            ${mediaHtml}
+                            <span class="flex-1 text-center font-bold text-gray-800 dark:text-white text-[15px] mr-2 ml-2">${data.title}</span>
+                            <div class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </div>
+                        </a>
+                    `;
+                });
+                
+                if (count === 0) {
+                    container.innerHTML = '<p class="text-center text-gray-500 font-bold mt-4">لا توجد روابط متاحة حالياً.</p>';
+                }
+
+                // إضافة متتبع النقرات (Analytics) لكل رابط
+                document.querySelectorAll('.bio-link-item').forEach(item => {
+                    item.addEventListener('click', async (e) => {
+                        const linkId = item.getAttribute('data-id');
+                        // نستخدم localStorage لضمان احتساب النقرة مرة واحدة لكل زائر على نفس الرابط
+                        if (linkId && !localStorage.getItem('clicked_bio_' + linkId)) {
+                            try {
+                                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'biolinks', linkId), {
+                                    clicks: increment(1)
+                                });
+                                localStorage.setItem('clicked_bio_' + linkId, 'true'); 
+                            } catch(err) {
+                                console.error("خطأ في تسجيل النقرة", err);
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
