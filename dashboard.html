@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الاحترافية - الوضع الداكن</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: { primary: '#0ea5e9', dark: '#0f172a' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; }
+        .sidebar-link.active { background-color: #0ea5e9; color: white; border-right: 4px solid #ffffff; }
+        .section-content { display: none; }
+        .section-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-gray-200 font-sans antialiased flex h-screen overflow-hidden">
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-40 hidden md:hidden transition-opacity opacity-0"></div>
+
+    <!-- القائمة الجانبية -->
+    <aside id="sidebar" class="w-64 bg-[#1e293b] shadow-2xl flex flex-col z-50 fixed inset-y-0 right-0 transform translate-x-full md:relative md:translate-x-0 transition-transform duration-300 h-full border-l border-gray-800">
+        <button id="close-sidebar" class="md:hidden absolute top-4 left-4 text-gray-400 hover:text-white text-2xl transition-colors">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="h-20 flex items-center justify-center border-b border-gray-800">
+            <a href="index.html" target="_blank" class="flex items-center justify-center hover:opacity-80 transition-opacity">
+                <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-12 object-contain brightness-0 invert">
+            </a>
+        </div>
+        
+        <nav class="flex-1 py-6 flex flex-col gap-2 overflow-y-auto">
+            <button onclick="switchSection('stats')" id="nav-stats" class="sidebar-link active flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
+                <i class="fa-solid fa-chart-pie w-5"></i> الإحصائيات
+            </button>
+            <button onclick="switchSection('create')" id="nav-create" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
+                <i class="fa-solid fa-pen-nib w-5"></i> كتابة مقال
+            </button>
+            <button onclick="switchSection('manage')" id="nav-manage" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
+                <i class="fa-solid fa-table-list w-5"></i> إدارة المقالات
+            </button>
+            <button onclick="switchSection('links')" id="nav-links" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
+                <i class="fa-solid fa-link w-5"></i> روابط البايو
+            </button>
+            <button onclick="switchSection('settings')" id="nav-settings" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
+                <i class="fa-solid fa-gear w-5"></i> الإعدادات
+            </button>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-800 flex flex-col gap-2">
+            <div class="bg-gray-800/50 text-blue-400 p-3 rounded-lg text-sm font-semibold flex items-center gap-2 border border-gray-700">
+                <i class="fa-solid fa-shield-check"></i> مدير موثق
+            </div>
+            <button id="logout-btn" class="bg-red-900/20 hover:bg-red-900/40 text-red-400 p-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 border border-red-900/50 transition-colors w-full">
+                <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+            </button>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 h-full overflow-y-auto bg-[#0f172a] relative w-full">
+        <header class="h-16 bg-[#1e293b] shadow-md flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10 w-full border-b border-gray-800">
+            <div class="flex items-center gap-3">
+                <button id="open-sidebar" class="md:hidden text-gray-400 hover:text-white text-xl transition-colors">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h2 id="header-title" class="text-lg sm:text-xl font-bold text-white">نظرة عامة والإحصائيات</h2>
+            </div>
+            <a href="index.html" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors flex items-center gap-1 border border-gray-700">
+                <i class="fa-solid fa-eye"></i> <span class="hidden sm:inline">عرض الموقع</span>
+            </a>
+        </header>
+
+        <div class="p-4 sm:p-8 pb-24 max-w-full overflow-hidden">
+            
+            <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-2xl font-bold flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none translate-y-[-20px] border border-green-500">
+                <i class="fa-solid fa-circle-check text-xl"></i>
+                <span id="toast-msg">تمت العملية بنجاح!</span>
+            </div>
+
+            <!-- 1. الإحصائيات -->
+            <section id="section-stats" class="section-content active">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-[#1e293b] rounded-2xl shadow-lg p-6 border border-gray-700 flex items-center gap-4">
+                        <div class="bg-blue-900/50 text-blue-400 w-14 h-14 rounded-full flex items-center justify-center text-2xl border border-blue-800"><i class="fa-solid fa-file-lines"></i></div>
+                        <div>
+                            <p class="text-gray-400 text-sm font-bold">إجمالي المقالات</p>
+                            <h3 id="stat-articles" class="text-3xl font-extrabold text-white">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-[#1e293b] rounded-2xl shadow-lg p-6 border border-gray-700 flex items-center gap-4">
+                        <div class="bg-purple-900/50 text-purple-400 w-14 h-14 rounded-full flex items-center justify-center text-2xl border border-purple-800"><i class="fa-solid fa-download"></i></div>
+                        <div>
+                            <p class="text-gray-400 text-sm font-bold">التحميلات (حقيقي)</p>
+                            <h3 id="stat-downloads" class="text-3xl font-extrabold text-green-400">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-[#1e293b] rounded-2xl shadow-lg p-6 border border-gray-700 flex items-center gap-4">
+                        <div class="bg-yellow-900/50 text-yellow-400 w-14 h-14 rounded-full flex items-center justify-center text-2xl border border-yellow-800"><i class="fa-solid fa-star"></i></div>
+                        <div>
+                            <p class="text-gray-400 text-sm font-bold">متوسط التقييم</p>
+                            <h3 id="stat-rating" class="text-3xl font-extrabold text-white">0.0</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. إضافة مقال -->
+            <section id="section-create" class="section-content">
+                <form id="addForm" class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8">
+                    <div class="border-b border-gray-700 pb-4 mb-6 flex justify-between items-center">
+                        <h3 id="form-section-title" class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-primary"></i> الذكاء الاصطناعي وصناعة المحتوى
+                        </h3>
+                        <button type="button" id="cancelEditBtn" class="hidden text-gray-400 hover:text-red-400 transition-colors flex items-center gap-1 font-bold">
+                            <i class="fa-solid fa-xmark"></i> إلغاء التعديل
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">اسم التطبيق / اللعبة *</label>
+                            <input type="text" id="title" required class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">القسم *</label>
+                            <select id="category" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+                                <option value="تطبيقات">تطبيقات</option>
+                                <option value="ألعاب">ألعاب</option>
+                                <option value="مواقع">مواقع</option>
+                                <option value="أخبار تقنية">أخبار تقنية</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">تفاصيل إضافية (اختياري)</label>
+                        <textarea id="promptDesc" rows="2" placeholder="اكتب بعض النقاط ليركز عليها الذكاء الاصطناعي..." class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"></textarea>
+                    </div>
+
+                    <div class="mb-6 p-5 bg-blue-900/20 border border-blue-800/50 rounded-xl">
+                        <label class="block text-sm font-bold text-blue-400 mb-2">غلاف المقال</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="imageUrl" required placeholder="رابط الصورة أو اضغط توليد..." class="flex-1 bg-[#0f172a] text-white border border-blue-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" dir="ltr">
+                            <button type="button" id="generateImageBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-image"></i> توليد
+                            </button>
+                        </div>
+                        <div id="imagePreviewContainer" class="hidden flex justify-center mt-3">
+                            <img id="imagePreview" src="" class="w-full max-w-md aspect-video object-cover rounded-xl shadow-lg border-2 border-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">التقييم</label>
+                            <input type="number" id="rating" step="0.1" max="5" min="1" value="4.5" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">عدد التحميلات الوهمي (للعرض العام)</label>
+                            <input type="text" id="downloads" value="+100,000" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
+                        </div>
+                    </div>
+
+                    <div class="mb-6 p-5 bg-green-900/10 border border-green-800/30 rounded-xl">
+                        <label class="block text-sm font-semibold text-green-400 mb-2">رابط التحميل المباشر *</label>
+                        <input type="url" id="downloadUrl" required placeholder="https://..." class="w-full bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500" dir="ltr">
+                    </div>
+
+                    <div class="mb-8 p-5 bg-purple-900/10 border border-purple-800/30 rounded-xl relative">
+                        <label class="block text-sm font-bold text-purple-400 mb-2">شرح المقال</label>
+                        <textarea id="content" rows="8" class="w-full bg-[#0f172a] text-white border border-purple-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 mb-2"></textarea>
+                        
+                        <div class="flex justify-end mt-2">
+                            <button type="button" id="generateBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> توليد بالذكاء الاصطناعي
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitArticleBtn" class="w-full bg-primary hover:bg-blue-600 text-white font-extrabold py-4 px-4 rounded-xl shadow-lg transition-all text-lg flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> نشر المقال
+                    </button>
+                </form>
+            </section>
+
+            <!-- 3. إدارة المقالات -->
+            <section id="section-manage" class="section-content">
+                <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 overflow-hidden">
+                    <div class="p-4 sm:p-6 border-b border-gray-700 bg-[#0f172a]/50">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-table-list text-primary"></i> المقالات المنشورة</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-gray-300">
+                            <thead class="bg-[#0f172a] text-gray-400 text-sm">
+                                <tr>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold">الصورة</th>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold">العنوان</th>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold">القسم</th>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold text-center">التحميلات الفعيلة</th>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold hidden sm:table-cell">التاريخ</th>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manage-table-body" class="divide-y divide-gray-800 text-sm">
+                                <tr><td colspan="6" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-primary"></i> جاري التحميل...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. روابط البايو -->
+            <section id="section-links" class="section-content">
+                <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8 mb-8">
+                    <h3 class="text-xl font-bold text-white mb-6 border-r-4 border-primary pr-3 flex items-center gap-2">
+                        <i class="fa-solid fa-id-card text-primary"></i> إعدادات الحساب (البايو)
+                    </h3>
+                    <form id="bioProfileForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">اسم الحساب (مثال: @Abdoucrz)</label>
+                            <input type="text" id="bioName" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">رابط الصورة الشخصية</label>
+                            <input type="url" id="bioImage" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">الوصف (Bio)</label>
+                            <textarea id="bioDesc" rows="2" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-xl border border-gray-600"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8 mb-8">
+                    <h3 class="text-xl font-bold text-white mb-6 border-r-4 border-primary pr-3 flex items-center gap-2">
+                        <i class="fa-solid fa-plus text-primary"></i> إضافة رابط جديد
+                    </h3>
+                    <form id="addBioLinkForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label class="block text-sm mb-2">عنوان الرابط *</label><input type="text" id="bioLinkTitle" required class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white"></div>
+                        <div><label class="block text-sm mb-2">الرابط (URL) *</label><input type="url" id="bioLinkUrl" required class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                        <div><label class="block text-sm mb-2">رابط صورة (اختياري)</label><input type="url" id="bioLinkImage" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                        <div><label class="block text-sm mb-2">كود أيقونة (اختياري)</label><input type="text" id="bioLinkIcon" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                        <div class="md:col-span-2 flex items-center gap-3 bg-[#0f172a] p-4 rounded-lg border border-gray-600 cursor-pointer" onclick="document.getElementById('bioLinkHighlight').click()">
+                            <input type="checkbox" id="bioLinkHighlight" class="w-5 h-5 accent-primary" onclick="event.stopPropagation()">
+                            <label class="text-sm font-bold text-gray-200 cursor-pointer">تمييز هذا الرابط (نبض ملون)</label>
+                        </div>
+                        <div class="md:col-span-2"><button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl">إضافة الرابط</button></div>
+                    </form>
+                </div>
+
+                <div class="bg-[#1e293b] rounded-2xl border border-gray-700 overflow-hidden">
+                    <div class="p-4 border-b border-gray-700 bg-[#0f172a]/50"><h3 class="font-bold text-white">الروابط الحالية</h3></div>
+                    <div class="p-4"><div id="bio-links-list" class="flex flex-col gap-3"></div></div>
+                </div>
+            </section>
+
+            <!-- 5. الإعدادات -->
+            <section id="section-settings" class="section-content">
+                <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8">
+                    <h3 class="text-xl font-bold text-white mb-6 border-r-4 border-primary pr-3 flex items-center gap-2">
+                        <i class="fa-solid fa-gear text-primary"></i> إعدادات الموقع
+                    </h3>
+                    <form id="seoForm">
+                        
+                        <!-- حقل مفتاح الذكاء الاصطناعي -->
+                        <div class="mb-8 p-5 bg-purple-900/20 border border-purple-700/50 rounded-xl">
+                            <label class="block text-sm font-bold text-purple-400 mb-2"><i class="fa-solid fa-key"></i> مفتاح Gemini API (لتوليد المقالات والصور)</label>
+                            <input type="password" id="geminiApiKey" placeholder="ضع مفتاح AIzaSy هنا..." class="w-full bg-[#0f172a] text-white border border-purple-700/50 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 text-left placeholder-gray-600" dir="ltr">
+                            <p class="text-xs text-gray-400 mt-2">احصل عليه مجاناً من Google AI Studio لكي تعمل أزرار التوليد.</p>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">وصف الموقع (لجوجل)</label>
+                            <textarea id="siteDesc" rows="3" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"></textarea>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">الكلمات المفتاحية (مفصول بفاصلة)</label>
+                            <input type="text" id="siteKeywords" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div><label class="block text-sm text-yellow-400 mb-2">AdSense ID</label><input type="text" id="adsenseId" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                            <div><label class="block text-sm text-blue-400 mb-2">Analytics ID</label><input type="text" id="analyticsId" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                        </div>
+
+                        <h4 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-share-nodes"></i> منصات التواصل</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                            <div><label class="block text-sm text-gray-300 mb-2">فيسبوك</label><input type="url" id="facebookUrl" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                            <div><label class="block text-sm text-gray-300 mb-2">تويتر</label><input type="url" id="twitterUrl" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                            <div><label class="block text-sm text-gray-300 mb-2">انستجرام</label><input type="url" id="instagramUrl" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                            <div><label class="block text-sm text-gray-300 mb-2">تيليجرام</label><input type="url" id="telegramUrl" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr"></div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-xl border border-gray-600"><i class="fa-solid fa-floppy-disk"></i> حفظ الإعدادات</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, onSnapshot, query, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
+            authDomain: "abdoucrz-dd234.firebaseapp.com",
+            projectId: "abdoucrz-dd234",
+            storageBucket: "abdoucrz-dd234.firebasestorage.app",
+            messagingSenderId: "305213328928",
+            appId: "1:305213328928:web:47136d037fbe88002af645"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'abdoucrz_blog';
+
+        // دالة التوجيه الذكية لتجنب الخطأ في بيئة المعاينة
+        const redirectToLogin = () => {
+            try {
+                window.location.href = 'login.html';
+            } catch (e) {
+                console.warn('تم حظر التوجيه في بيئة المعاينة. سيتم إظهار رسالة بديلة.');
+                document.body.innerHTML = `
+                    <div style="display:flex;height:100vh;justify-content:center;align-items:center;background:#0f172a;color:#fff;flex-direction:column;gap:20px;font-family:'Cairo',sans-serif;">
+                        <h2 style="font-size: 1.5rem; font-weight: bold;">يجب تسجيل الدخول للوصول إلى لوحة التحكم</h2>
+                        <a href="login.html" style="background:#0ea5e9;padding:12px 24px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;transition:0.3s;">الذهاب لصفحة تسجيل الدخول</a>
+                    </div>
+                `;
+            }
+        };
+
+        // الحماية وطرد المتطفلين
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.isAnonymous) {
+                redirectToLogin(); 
+                return;
+            }
+            initDashboardData();
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => redirectToLogin());
+        });
+
+        // دوال التوجيه والإشعارات الأساسية
+        window.switchSection = function(sectionId) {
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+            document.getElementById('nav-' + sectionId).classList.add('active');
+            document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
+            document.getElementById('section-' + sectionId).classList.add('active');
+            
+            const titles = {'stats': 'الإحصائيات', 'create': 'كتابة مقال', 'manage': 'إدارة المقالات', 'links': 'روابط البايو', 'settings': 'الإعدادات'};
+            document.getElementById('header-title').textContent = titles[sectionId];
+            if (window.innerWidth < 768) toggleMobileSidebar(false);
+        };
+
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        function toggleMobileSidebar(show) {
+            if(show) { sidebarOverlay.classList.remove('hidden'); setTimeout(() => sidebarOverlay.classList.remove('opacity-0'), 10); sidebar.classList.remove('translate-x-full'); }
+            else { sidebarOverlay.classList.add('opacity-0'); sidebar.classList.add('translate-x-full'); setTimeout(() => sidebarOverlay.classList.add('hidden'), 300); }
+        }
+        document.getElementById('open-sidebar').addEventListener('click', () => toggleMobileSidebar(true));
+        document.getElementById('close-sidebar').addEventListener('click', () => toggleMobileSidebar(false));
+        sidebarOverlay.addEventListener('click', () => toggleMobileSidebar(false));
+
+        window.showToast = function(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-2xl font-bold flex items-center gap-3 transition-all duration-300 ${isError ? 'bg-red-600 border-red-500 text-white' : 'bg-green-600 border-green-500 text-white'}`;
+            toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+            setTimeout(() => toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none'), 3000);
+        };
+
+        function compressImage(base64Str) {
+            return new Promise((resolve) => {
+                const img = new Image(); img.src = base64Str;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                    let w = img.width, h = img.height;
+                    if(w > 800) { h = Math.round((h * 800) / w); w = 800; }
+                    canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.onerror = () => resolve(base64Str);
+            });
+        }
+
+        // --- الدالة الرئيسية التي تشغل اللوحة ---
+        function initDashboardData() {
+            
+            // --- 1. إدارة المقالات ---
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById('manage-table-body');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                
+                let totalArticles = 0; let totalActualDownloads = 0; let totalRating = 0;
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data(); const id = docSnap.id;
+                    totalArticles++; totalRating += parseFloat(data.rating || 4);
+                    const actualD = data.actualDownloads || 0; totalActualDownloads += actualD;
+                    const dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-800/50 transition-colors">
+                            <td class="px-4 sm:px-6 py-3"><img src="${data.imageUrl}" class="w-12 h-8 object-cover rounded shadow-sm border border-gray-600" onerror="this.src='https://via.placeholder.com/50'"></td>
+                            <td class="px-4 sm:px-6 py-3 font-semibold text-white line-clamp-1">${data.title}</td>
+                            <td class="px-4 sm:px-6 py-3"><span class="bg-gray-700 text-gray-200 px-2 py-1 rounded text-xs">${data.category}</span></td>
+                            <td class="px-4 sm:px-6 py-3 text-center font-bold text-green-400">${actualD}</td>
+                            <td class="px-4 sm:px-6 py-3 text-gray-400 text-xs hidden sm:table-cell">${dateStr}</td>
+                            <td class="px-4 sm:px-6 py-3 text-center">
+                                <button onclick="editArticle('${id}')" class="text-yellow-400 hover:bg-yellow-900/50 p-2 rounded transition-colors" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteArticle('${id}')" class="text-red-400 hover:bg-red-900/50 p-2 rounded transition-colors mx-1" title="حذف"><i class="fa-solid fa-trash-can"></i></button>
+                                <a href="article.html?id=${id}" target="_blank" class="text-blue-400 hover:bg-blue-900/50 p-2 rounded transition-colors" title="عرض"><i class="fa-solid fa-eye"></i></a>
+                            </td>
+                        </tr>`;
+                });
+
+                if(totalArticles === 0) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500 font-bold">لا توجد مقالات منشورة.</td></tr>';
+                document.getElementById('stat-articles').textContent = totalArticles;
+                document.getElementById('stat-downloads').textContent = totalActualDownloads;
+                document.getElementById('stat-rating').textContent = totalArticles > 0 ? (totalRating / totalArticles).toFixed(1) : "0.0";
+            });
+
+            window.deleteArticle = async function(docId) {
+                if(confirm('هل أنت متأكد من الحذف؟')) {
+                    try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', docId)); showToast("تم الحذف!"); } 
+                    catch(e) { showToast("فشل الحذف", true); }
+                }
+            };
+
+            window.currentEditId = null;
+            window.editArticle = async function(docId) {
+                try {
+                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', docId));
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        document.getElementById('title').value = data.title || '';
+                        document.getElementById('category').value = data.category || 'تطبيقات';
+                        document.getElementById('imageUrl').value = data.imageUrl || '';
+                        document.getElementById('rating').value = data.rating || '4.5';
+                        document.getElementById('downloads').value = data.downloads || '';
+                        document.getElementById('downloadUrl').value = data.downloadUrl || '';
+                        document.getElementById('content').value = data.content || '';
+                        if (data.imageUrl) {
+                            document.getElementById('imagePreview').src = data.imageUrl;
+                            document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                        }
+                        window.currentEditId = docId;
+                        document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-pen text-yellow-400"></i> تعديل المقال';
+                        document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات';
+                        document.getElementById('cancelEditBtn').classList.remove('hidden');
+                        switchSection('create');
+                    }
+                } catch(e) { showToast("خطأ في الجلب", true); }
+            };
+
+            document.getElementById('cancelEditBtn').addEventListener('click', () => {
+                window.currentEditId = null; document.getElementById('addForm').reset();
+                document.getElementById('imagePreviewContainer').classList.add('hidden');
+                document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-primary"></i> الذكاء الاصطناعي';
+                document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> نشر المقال';
+                document.getElementById('cancelEditBtn').classList.add('hidden');
+                switchSection('manage');
+            });
+
+            // --- 2. نشر المقال ---
+            document.getElementById('addForm').addEventListener('submit', async (e) => {
+                e.preventDefault(); const btn = document.getElementById('submitArticleBtn'); const orig = btn.innerHTML;
+                btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
+                try {
+                    const data = { title: document.getElementById('title').value, category: document.getElementById('category').value, imageUrl: document.getElementById('imageUrl').value, content: document.getElementById('content').value, rating: document.getElementById('rating').value, downloads: document.getElementById('downloads').value, downloadUrl: document.getElementById('downloadUrl').value };
+                    if (window.currentEditId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', window.currentEditId), data); showToast("تم التحديث!"); } 
+                    else { data.actualDownloads = 0; data.createdAt = serverTimestamp(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), data); showToast("تم النشر!"); }
+                    document.getElementById('cancelEditBtn').click();
+                } catch (e) { showToast("خطأ في الحفظ", true); } 
+                finally { btn.disabled = false; btn.innerHTML = orig; }
+            });
+
+            async function getGeminiKey() {
+                const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo'));
+                if (snap.exists() && snap.data().geminiApiKey) return snap.data().geminiApiKey.trim();
+                return null;
+            }
+
+            // --- 3. توليد النص بالذكاء الاصطناعي ---
+            document.getElementById('generateBtn').addEventListener('click', async () => {
+                const title = document.getElementById('title').value;
+                if (!title) { showToast("اكتب اسم التطبيق أولاً!", true); return; }
+                const apiKey = await getGeminiKey();
+                if (!apiKey) { showToast("يرجى إضافة مفتاح Gemini API في قسم الإعدادات!", true); return; }
+
+                const btn = document.getElementById('generateBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الكتابة...';
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: `اكتب مقالاً مفصلاً وعفوياً لمدونتي حول التطبيق: "${title}". بأسلوب بشري 100% بدون رموز نجوم **` }] }],
+                            systemInstruction: { parts: [{ text: "أنت مدون تقني عربي." }] }
+                        })
+                    });
+                    const result = await res.json();
+                    if (result.error) throw new Error(result.error.message);
+                    document.getElementById('content').value = result.candidates[0].content.parts[0].text;
+                    showToast("تم توليد المقال!");
+                } catch (e) { showToast("فشل الاتصال بالذكاء الاصطناعي", true); } 
+                finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> توليد بالذكاء الاصطناعي'; }
+            });
+
+            // --- 4. توليد الصور بالذكاء الاصطناعي ---
+            document.getElementById('generateImageBtn').addEventListener('click', async () => {
+                const title = document.getElementById('title').value;
+                if (!title) { showToast("اكتب الاسم أولاً!", true); return; }
+                const apiKey = await getGeminiKey();
+                if (!apiKey) { showToast("يرجى إضافة مفتاح Gemini API في قسم الإعدادات!", true); return; }
+
+                const btn = document.getElementById('generateImageBtn'); btn.disabled = true; btn.innerHTML = '...';
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ instances: [{ prompt: `A stunning promotional wallpaper for an app called "${title}". No text allowed.` }], parameters: { sampleCount: 1, aspectRatio: "16:9" } })
+                    });
+                    const result = await res.json();
+                    if (result.error) throw new Error(result.error.message);
+                    const base64 = result.predictions[0].bytesBase64Encoded;
+                    if (base64) {
+                        const compressed = await compressImage(`data:image/png;base64,${base64}`);
+                        document.getElementById('imageUrl').value = compressed;
+                        document.getElementById('imagePreview').src = compressed;
+                        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                        showToast("تم توليد الصورة!");
+                    }
+                } catch (e) { showToast("فشل توليد الصورة", true); } 
+                finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-image"></i> توليد'; }
+            });
+
+            // --- 5. الإعدادات (حفظ وجلب) ---
+            const seoDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo');
+            getDoc(seoDocRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                    const d = docSnap.data();
+                    document.getElementById('geminiApiKey').value = d.geminiApiKey || '';
+                    document.getElementById('siteDesc').value = d.description || '';
+                    document.getElementById('siteKeywords').value = d.keywords || '';
+                    document.getElementById('adsenseId').value = d.adsenseId || '';
+                    document.getElementById('analyticsId').value = d.analyticsId || '';
+                    document.getElementById('facebookUrl').value = d.facebookUrl || '';
+                    document.getElementById('twitterUrl').value = d.twitterUrl || '';
+                    document.getElementById('instagramUrl').value = d.instagramUrl || '';
+                    document.getElementById('telegramUrl').value = d.telegramUrl || '';
+                }
+            });
+
+            document.getElementById('seoForm').addEventListener('submit', async (e) => {
+                e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML;
+                btn.disabled = true; btn.innerHTML = 'جاري الحفظ...';
+                try {
+                    await setDoc(seoDocRef, {
+                        geminiApiKey: document.getElementById('geminiApiKey').value,
+                        description: document.getElementById('siteDesc').value, keywords: document.getElementById('siteKeywords').value,
+                        adsenseId: document.getElementById('adsenseId').value, analyticsId: document.getElementById('analyticsId').value,
+                        facebookUrl: document.getElementById('facebookUrl').value, twitterUrl: document.getElementById('twitterUrl').value,
+                        instagramUrl: document.getElementById('instagramUrl').value, telegramUrl: document.getElementById('telegramUrl').value,
+                        updatedAt: serverTimestamp()
+                    }, { merge: true }); showToast("تم حفظ الإعدادات!");
+                } catch (e) { showToast("خطأ في الحفظ", true); } 
+                finally { btn.disabled = false; btn.innerHTML = orig; }
+            });
+
+            // --- 6. روابط البايو ---
+            const bioProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'bio_profile');
+            getDoc(bioProfileRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                    const d = docSnap.data();
+                    document.getElementById('bioName').value = d.name || '';
+                    document.getElementById('bioImage').value = d.imageUrl || '';
+                    document.getElementById('bioDesc').value = d.description || '';
+                }
+            });
+
+            document.getElementById('bioProfileForm').addEventListener('submit', async (e) => {
+                e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '...';
+                try { await setDoc(bioProfileRef, { name: document.getElementById('bioName').value, imageUrl: document.getElementById('bioImage').value, description: document.getElementById('bioDesc').value, updatedAt: serverTimestamp() }, { merge: true }); showToast("تم الحفظ!"); } 
+                catch (err) { showToast("خطأ", true); } finally { btn.disabled = false; btn.innerHTML = orig; }
+            });
+
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'biolinks')), (snapshot) => {
+                const list = document.getElementById('bio-links-list'); list.innerHTML = ''; let count = 0;
+                snapshot.forEach(docSnap => {
+                    count++; const d = docSnap.data();
+                    let iconHtml = d.imageUrl ? `<img src="${d.imageUrl}" class="w-10 h-10 rounded-lg object-cover">` : `<div class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white"><i class="${d.iconClass || 'fa-solid fa-link'}"></i></div>`;
+                    list.innerHTML += `<div class="flex items-center justify-between bg-[#0f172a] p-3 rounded-xl border border-gray-700">
+                        <div class="flex items-center gap-3">${iconHtml}<div><h4 class="text-white font-bold text-sm">${d.title}</h4><div class="text-green-400 text-[11px]"><i class="fa-solid fa-chart-simple"></i> ${d.clicks || 0} نقرة</div></div></div>
+                        <button onclick="deleteBioLink('${docSnap.id}')" class="text-red-400 hover:bg-red-900/30 p-2 rounded"><i class="fa-solid fa-trash-can"></i></button></div>`;
+                });
+                if(count === 0) list.innerHTML = '<div class="text-center py-4 text-gray-500">لا توجد روابط.</div>';
+            });
+
+            window.deleteBioLink = async function(docId) {
+                if(confirm('متأكد؟')) { try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'biolinks', docId)); showToast("تم الحذف"); } catch (e) { showToast("خطأ", true); } }
+            };
+
+            document.getElementById('addBioLinkForm').addEventListener('submit', async (e) => {
+                e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '...';
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'biolinks'), {
+                        title: document.getElementById('bioLinkTitle').value, url: document.getElementById('bioLinkUrl').value,
+                        imageUrl: document.getElementById('bioLinkImage').value, iconClass: document.getElementById('bioLinkIcon').value,
+                        isHighlighted: document.getElementById('bioLinkHighlight').checked, clicks: 0, createdAt: serverTimestamp()
+                    }); showToast("تم الإضافة!"); e.target.reset();
+                } catch (err) { showToast("خطأ", true); } finally { btn.disabled = false; btn.innerHTML = orig; }
+            });
+        }
+    </script>
+</body>
+</html>
