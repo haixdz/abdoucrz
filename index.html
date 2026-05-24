@@ -199,7 +199,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // تم إضافة setDoc و increment هنا للإحصائيات
         import { getFirestore, collection, query, onSnapshot, doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -278,7 +277,7 @@
                         metaKeywords.content = seoData.keywords;
                         document.head.appendChild(metaKeywords);
                     }
-                    
+
                     // إضافة كود إثبات الملكية (Google Site Verification)
                     if (seoData.siteVerification) {
                         let metaVerification = document.createElement('meta');
@@ -363,8 +362,14 @@
 
                 let displayCount = 0;
 
-                // كود عرض المقالات مع تطبيق الفلترة
+                // كود عرض المقالات مع تطبيق الفلترة ونظام الإخفاء
                 articles.forEach((article, index) => {
+                    
+                    // --- الميزة الجديدة: إخفاء المقالات الخاصة من الصفحة الرئيسية ---
+                    if (article.isUnlisted === true) {
+                        return; // تجاوز هذا المقال ولا تقم بعرضه
+                    }
+
                     // فلترة المقال بناءً على التصنيف المختار
                     if (selectedCategory && article.category !== selectedCategory) {
                         return; // تخطي المقال وإخفاؤه

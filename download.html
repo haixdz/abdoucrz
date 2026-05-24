@@ -70,7 +70,7 @@
             <h3 id="status-title" class="text-2xl font-bold mb-6 dark:text-white">جاري التجهيز...</h3>
             
             <div id="timer-container" class="text-gray-600 dark:text-gray-300 font-bold mb-6 text-xl">
-                الرجاء الانتظار <span id="countdown" class="text-primary text-3xl mx-2">30</span> ثانية
+                الرجاء الانتظار <span id="countdown" class="text-primary text-3xl mx-2">20</span> ثانية
             </div>
 
             <div id="progress-container" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-8 overflow-hidden flex justify-end">
@@ -190,9 +190,9 @@
                 }
             } catch (e) { console.error("Error fetching article snippet:", e); }
 
-            // برمجة المؤقت 30 ثانية
-            let timeLeft = 30;
-            const totalTime = 30;
+            // برمجة المؤقت 20 ثانية
+            let timeLeft = 20;
+            const totalTime = 20;
             const countdownEl = document.getElementById('countdown');
             const progressBar = document.getElementById('progress-bar');
             const nextBtn = document.getElementById('next-btn');

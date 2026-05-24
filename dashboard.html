@@ -231,6 +231,15 @@
                         </button>
                     </div>
 
+                    <!-- نظام المقال المخفي (الخاص) -->
+                    <div class="mb-6 flex items-center gap-3 bg-[#0f172a] p-4 rounded-lg border border-gray-600 cursor-pointer" onclick="document.getElementById('isUnlisted').click()">
+                        <input type="checkbox" id="isUnlisted" class="w-5 h-5 accent-primary" onclick="event.stopPropagation()">
+                        <div class="flex flex-col">
+                            <label class="text-sm font-bold text-gray-200 cursor-pointer">مقال خاص / مخفي</label>
+                            <p class="text-xs text-gray-400 cursor-pointer">هذا المقال لن يظهر في الصفحة الرئيسية للمدونة، وسيظهر فقط لأي شخص تعطيه الرابط المباشر.</p>
+                        </div>
+                    </div>
+
                     <div class="mb-8 p-5 bg-purple-900/10 border border-purple-800/30 rounded-xl relative">
                         <label class="block text-sm font-bold text-purple-400 mb-2">شرح المقال</label>
                         <textarea id="content" rows="8" class="w-full bg-[#0f172a] text-white border border-purple-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 mb-2"></textarea>
@@ -545,17 +554,20 @@
                     const actualD = data.actualDownloads || 0; totalActualDownloads += actualD;
                     const dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
 
+                    // تمييز المقال المخفي بعلامة بصرية
+                    const isHiddenIcon = data.isUnlisted ? '<span class="text-xs bg-red-900/50 text-red-400 px-2 py-1 rounded ml-2" title="مقال مخفي"><i class="fa-solid fa-eye-slash"></i></span> ' : '';
+
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-800/50 transition-colors">
                             <td class="px-4 sm:px-6 py-3"><img src="${data.imageUrl}" class="w-12 h-8 object-cover rounded shadow-sm border border-gray-600" onerror="this.src='https://via.placeholder.com/50'"></td>
-                            <td class="px-4 sm:px-6 py-3 font-semibold text-white line-clamp-1">${data.title}</td>
+                            <td class="px-4 sm:px-6 py-3 font-semibold text-white line-clamp-1">${isHiddenIcon}${data.title}</td>
                             <td class="px-4 sm:px-6 py-3"><span class="bg-gray-700 text-gray-200 px-2 py-1 rounded text-xs">${data.category}</span></td>
                             <td class="px-4 sm:px-6 py-3 text-center font-bold text-green-400">${actualD}</td>
                             <td class="px-4 sm:px-6 py-3 text-gray-400 text-xs hidden sm:table-cell">${dateStr}</td>
                             <td class="px-4 sm:px-6 py-3 text-center flex justify-center gap-1">
                                 <button onclick="editArticle('${id}')" class="text-yellow-400 hover:bg-yellow-900/50 p-2 rounded transition-colors" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="deleteArticle('${id}')" class="text-red-400 hover:bg-red-900/50 p-2 rounded transition-colors" title="حذف"><i class="fa-solid fa-trash-can"></i></button>
-                                <a href="article.html?id=${id}" target="_blank" class="text-blue-400 hover:bg-blue-900/50 p-2 rounded transition-colors" title="عرض"><i class="fa-solid fa-eye"></i></a>
+                                <a href="article.html?id=${id}" target="_blank" class="text-blue-400 hover:bg-blue-900/50 p-2 rounded transition-colors" title="عرض الرابط المباشر"><i class="fa-solid fa-link"></i></a>
                             </td>
                         </tr>`;
                 });
@@ -582,16 +594,17 @@
                         document.getElementById('rating').value = data.rating || '4.5';
                         document.getElementById('downloads').value = data.downloads || '';
                         document.getElementById('content').value = data.content || '';
+                        document.getElementById('isUnlisted').checked = data.isUnlisted || false; // سحب حالة المقال المخفي
                         if (data.imageUrl) { document.getElementById('imagePreview').src = data.imageUrl; document.getElementById('imagePreviewContainer').classList.remove('hidden'); }
                         
                         // تعبئة الروابط المتعددة
                         document.getElementById('links-container').innerHTML = '';
                         if (data.downloadLinks && data.downloadLinks.length > 0) {
                             data.downloadLinks.forEach(link => addNewLinkField(link.name, link.url));
-                        } else if (data.downloadUrl) { // دعم للمقالات القديمة
+                        } else if (data.downloadUrl) { 
                             addNewLinkField('تحميل مباشر', data.downloadUrl);
                         } else {
-                            addNewLinkField(); // حقل فارغ افتراضي
+                            addNewLinkField(); 
                         }
 
                         window.currentEditId = docId;
@@ -607,6 +620,7 @@
                 window.currentEditId = null; document.getElementById('addForm').reset();
                 document.getElementById('imagePreviewContainer').classList.add('hidden');
                 document.getElementById('links-container').innerHTML = ''; addNewLinkField();
+                document.getElementById('isUnlisted').checked = false; // إعادة تعيين حالة المخفي
                 document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-primary"></i> الذكاء الاصطناعي';
                 document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> نشر المقال';
                 document.getElementById('cancelEditBtn').classList.add('hidden');
@@ -616,12 +630,11 @@
             // ضمان وجود حقل واحد على الأقل عند التحميل
             addNewLinkField();
 
-            // --- 2. نشر المقال (تعديل لاستخراج مصفوفة الروابط) ---
+            // --- 2. نشر المقال (مع إضافة ميزة المقال المخفي) ---
             document.getElementById('addForm').addEventListener('submit', async (e) => {
                 e.preventDefault(); const btn = document.getElementById('submitArticleBtn'); const orig = btn.innerHTML;
                 btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
                 
-                // جمع الروابط من الحقول
                 let downloadLinks = [];
                 document.querySelectorAll('.link-item').forEach(item => {
                     const name = item.querySelector('.link-name').value;
@@ -642,7 +655,8 @@
                         content: document.getElementById('content').value, 
                         rating: document.getElementById('rating').value, 
                         downloads: document.getElementById('downloads').value, 
-                        downloadLinks: downloadLinks // حفظ مصفوفة الروابط
+                        downloadLinks: downloadLinks,
+                        isUnlisted: document.getElementById('isUnlisted').checked // حفظ حالة الإخفاء في قاعدة البيانات
                     };
                     if (window.currentEditId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', window.currentEditId), data); showToast("تم التحديث!"); } 
                     else { data.actualDownloads = 0; data.createdAt = serverTimestamp(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), data); showToast("تم النشر!"); }
