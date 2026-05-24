@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جاري تحضير الرابط - abdoucrz</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: { primary: '#0ea5e9', dark: '#1e293b' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col items-center">
+
+    <!-- الهيدر البسيط -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm w-full transition-colors sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="hover:opacity-80 transition-opacity">
+                <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-10 object-contain dark:brightness-0 dark:invert">
+            </a>
+            <div id="header-status" class="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-4 py-1.5 rounded-full font-bold text-sm shadow-sm">
+                في انتظار البدء
+            </div>
+        </div>
+    </header>
+
+    <!-- إعلان علوي كبير -->
+    <div class="w-full max-w-4xl px-4 mt-6">
+        <div class="bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-2 text-center h-[100px] md:h-[150px] flex flex-col justify-center items-center">
+            <span class="text-gray-500 font-bold"><i class="fa-solid fa-rectangle-ad text-2xl mb-2 block"></i> مساحة إعلانية علوية (AdSense)</span>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="w-full max-w-3xl px-4 py-8 flex-1 flex flex-col items-center">
+        
+        <!-- صندوق معلومات التطبيق والعداد -->
+        <div id="app-info-card" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 w-full text-center relative overflow-hidden hidden transition-colors mb-8">
+            
+            <img id="app-image" src="" alt="صورة التطبيق" class="w-24 h-24 object-cover rounded-2xl mx-auto shadow-md mb-4 border-2 border-gray-100 dark:border-gray-700" onerror="this.src='https://via.placeholder.com/100'">
+            <h1 id="app-name" class="text-2xl font-bold mb-2 dark:text-white">جاري التحميل...</h1>
+            
+            <div class="flex justify-center items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-6 border-b border-gray-100 dark:border-gray-700 pb-6">
+                <span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-3 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-shield-check"></i> آمن ومفحوص</span>
+                <span class="font-bold flex items-center gap-1"><i class="fa-solid fa-server"></i> خادم سريع</span>
+            </div>
+
+            <!-- عرض جزء من الرابط لطمأنة الزائر -->
+            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 mb-6 border border-gray-200 dark:border-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-bold mb-1">الرابط الوجهة:</p>
+                <p id="target-url-preview" class="text-sm text-blue-500 font-mono break-all" dir="ltr">https://...</p>
+            </div>
+
+            <!-- منطقة الأزرار والعداد التفاعلي -->
+            <div id="action-container" class="mt-4">
+                
+                <!-- 1. زر بدء العداد -->
+                <button id="start-timer-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all text-lg flex items-center justify-center gap-2">
+                    <span>اضغط هنا لبدء تجهيز الرابط</span> <i class="fa-solid fa-hourglass-start"></i>
+                </button>
+                
+                <!-- 2. شاشة العداد (مخفية في البداية) -->
+                <div id="timer-display" class="hidden w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold py-4 rounded-xl border border-gray-300 dark:border-gray-600 text-lg flex flex-col items-center justify-center gap-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-spinner fa-spin text-primary"></i> 
+                        <span id="timer-text">الرجاء الانتظار 15 ثانية...</span>
+                    </div>
+                    <span class="text-xs text-gray-500 font-normal">يمكنك قراءة تفاصيل التطبيق بالأسفل ريثما ينتهي العداد</span>
+                </div>
+
+                <!-- 3. زر التحميل النهائي (مخفي في البداية) -->
+                <button id="final-download-btn" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-lg flex items-center justify-center gap-2 animate-bounce mt-4">
+                    <span>تحميل الملف الآن</span> <i class="fa-solid fa-download"></i>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- إعلان وسطي ضخم -->
+        <div class="w-full mb-8">
+            <div class="bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-2 text-center h-[250px] flex flex-col justify-center items-center">
+                <span class="text-gray-500 font-bold"><i class="fa-solid fa-rectangle-ad text-3xl mb-2 block"></i> مساحة إعلانية وسطية (AdSense)</span>
+            </div>
+        </div>
+
+        <!-- نص المقال (لإبقاء الزائر متفاعلاً) -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8 w-full text-center md:text-right transition-colors">
+            <h3 class="text-xl font-bold border-r-4 border-primary pr-3 mb-6 dark:text-white">معلومات وتفاصيل التطبيق</h3>
+            <article id="article-body" class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
+                <div class="flex justify-center"><i class="fa-solid fa-spinner fa-spin text-3xl text-gray-400"></i></div>
+            </article>
+        </div>
+
+    </main>
+
+    <!-- إعلان سفلي ثابت -->
+    <div class="w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-2 mt-auto text-center sticky bottom-0 z-50 transition-colors">
+        <span class="text-xs text-gray-400 font-bold block mb-1">إعلان سفلي مثبت (AdSense)</span>
+        <div class="w-full max-w-3xl mx-auto h-[50px] bg-gray-100 dark:bg-gray-900 rounded border border-dashed border-gray-300 dark:border-gray-700"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
+            authDomain: "abdoucrz-dd234.firebaseapp.com",
+            projectId: "abdoucrz-dd234",
+            storageBucket: "abdoucrz-dd234.firebasestorage.app",
+            messagingSenderId: "305213328928",
+            appId: "1:305213328928:web:47136d037fbe88002af645"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'abdoucrz_blog';
+
+        let actualDownloadUrl = "";
+        let articleId = new URLSearchParams(window.location.search).get('id');
+
+        // الوضع الليلي الافتراضي
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        signInAnonymously(auth).then(async () => {
+            if (!articleId) {
+                document.getElementById('app-name').textContent = "رابط غير صالح";
+                document.getElementById('article-body').innerHTML = '<p class="text-red-500 font-bold">عذراً، الرابط غير صحيح.</p>';
+                return;
+            }
+
+            try {
+                const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    document.getElementById('app-info-card').classList.remove('hidden');
+                    document.getElementById('app-name').textContent = data.title;
+                    document.getElementById('app-image').src = data.imageUrl || '';
+                    
+                    actualDownloadUrl = data.downloadUrl || "";
+                    
+                    // إخفاء جزء من الرابط للحماية والإثارة
+                    if (actualDownloadUrl) {
+                        try {
+                            const urlObj = new URL(actualDownloadUrl);
+                            const host = urlObj.hostname;
+                            const maskedUrl = `https://${host.substring(0, 5)}...${urlObj.pathname.substring(urlObj.pathname.length - 10)}`;
+                            document.getElementById('target-url-preview').textContent = maskedUrl;
+                        } catch (e) {
+                            document.getElementById('target-url-preview').textContent = actualDownloadUrl.substring(0, 20) + '...';
+                        }
+                    } else {
+                        document.getElementById('target-url-preview').textContent = "الرابط غير متوفر";
+                    }
+
+                    // --- جلب وعرض نص المقال مع الإعلانات المدمجة ---
+                    const articleBody = document.getElementById('article-body');
+                    if(data.content) {
+                        let paragraphs = data.content.split(/\n\n+/).filter(p => p.trim() !== '');
+                        let formattedContent = '';
+                        
+                        const inlineAdHtml = `
+                            <div class="my-6 w-full clear-both">
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[100px] border border-dashed border-gray-300 dark:border-gray-600">
+                                    <span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> إعلان مدمج (AdSense)</span>
+                                </div>
+                            </div>
+                        `;
+
+                        paragraphs.forEach((p, index) => {
+                            formattedContent += `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`;
+                            if (index < paragraphs.length - 1) {
+                                formattedContent += inlineAdHtml;
+                            }
+                        });
+                        articleBody.innerHTML = formattedContent;
+                    } else {
+                        articleBody.innerHTML = '<p>المحتوى غير متوفر حالياً.</p>';
+                    }
+
+                    // --- برمجة العداد التنازلي التفاعلي ---
+                    const startBtn = document.getElementById('start-timer-btn');
+                    const timerDisplay = document.getElementById('timer-display');
+                    const timerText = document.getElementById('timer-text');
+                    const finalBtn = document.getElementById('final-download-btn');
+                    const headerStatus = document.getElementById('header-status');
+
+                    startBtn.addEventListener('click', () => {
+                        // إخفاء زر البدء وإظهار العداد
+                        startBtn.classList.add('hidden');
+                        timerDisplay.classList.remove('hidden');
+                        
+                        headerStatus.classList.replace('bg-gray-200', 'bg-primary');
+                        headerStatus.classList.replace('dark:bg-gray-700', 'bg-primary');
+                        headerStatus.classList.replace('text-gray-600', 'text-white');
+                        headerStatus.classList.replace('dark:text-gray-300', 'text-white');
+                        headerStatus.classList.add('animate-pulse');
+                        headerStatus.textContent = "يتم التجهيز...";
+
+                        let MathTime = 15; // عدد ثواني الانتظار (تستطيع تغييره لزيادة مدة بقاء الزائر)
+                        timerText.textContent = `الرجاء الانتظار ${MathTime} ثانية...`;
+
+                        const timer = setInterval(() => {
+                            MathTime--;
+                            timerText.textContent = `الرجاء الانتظار ${MathTime} ثانية...`;
+                            
+                            if (MathTime <= 0) {
+                                clearInterval(timer);
+                                // إخفاء العداد وإظهار زر التحميل النهائي
+                                timerDisplay.classList.add('hidden');
+                                finalBtn.classList.remove('hidden');
+                                
+                                headerStatus.textContent = "الرابط جاهز!";
+                                headerStatus.classList.remove('animate-pulse');
+                                headerStatus.classList.replace('bg-primary', 'bg-green-500');
+                            }
+                        }, 1000);
+                    });
+
+                    // برمجة زر التحميل النهائي
+                    finalBtn.addEventListener('click', async () => {
+                        if (!localStorage.getItem(`downloaded_${articleId}`)) {
+                            try {
+                                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId), {
+                                    actualDownloads: increment(1)
+                                });
+                                localStorage.setItem(`downloaded_${articleId}`, 'true');
+                            } catch (e) {
+                                console.error(e);
+                            }
+                        }
+                        if (actualDownloadUrl) window.location.href = actualDownloadUrl;
+                    });
+
+                } else {
+                    document.getElementById('app-name').textContent = "المقال غير موجود";
+                    document.getElementById('article-body').innerHTML = '<p class="text-red-500 font-bold">هذا المقال لم يعد متاحاً.</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('app-name').textContent = "حدث خطأ في الاتصال";
+            }
+        });
+    </script>
+</body>
+</html>

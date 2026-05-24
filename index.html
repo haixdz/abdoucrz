@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدونة abdoucrz - تحميل أفضل التطبيقات والألعاب</title>
+    <title>abdoucrz - مدونة التقنية والتطبيقات</title>
     
-    <!-- كود التحقق السريع من Google AdSense (انسخ المعرف الخاص بك وضعه بدلا من X إذا أردت تسريع المراجعة يدويا) -->
-    <!-- <meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXX"> -->
-
+    <!-- خطوط جوجل (Cairo) لدعم اللغة العربية بشكل احترافي -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -87,7 +85,7 @@
         </div>
     </header>
 
-    <!-- القائمة الجانبية للهواتف (Mobile Sidebar) - هذا الجزء كان مفقوداً -->
+    <!-- القائمة الجانبية للهواتف (Mobile Sidebar) -->
     <div id="mobile-sidebar" class="fixed inset-0 z-50 hidden">
         <!-- خلفية مظلمة (Overlay) -->
         <div id="mobile-sidebar-overlay" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity opacity-0"></div>
@@ -130,7 +128,7 @@
             </div>
         </div>
 
-        <!-- حاوية المقالات (تم إصلاح المعرّف المفقود هنا) -->
+        <!-- حاوية المقالات -->
         <div id="articles-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             
             <!-- رسالة تحميل تظهر حتى يتم جلب البيانات -->
@@ -201,7 +199,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // تم إضافة setDoc و increment هنا للإحصائيات
+        import { getFirestore, collection, query, onSnapshot, doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
@@ -219,6 +218,47 @@
         const appId = 'abdoucrz_blog';
 
         signInAnonymously(auth).then(() => {
+            
+            // --- نظام الإحصائيات المخصص (Tracker الذكي الجديد للرسم البياني) ---
+            async function trackVisit() {
+                // استخراج تاريخ اليوم بصيغة YYYY-MM-DD
+                const today = new Date().toISOString().split('T')[0]; 
+                
+                const globalRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'global_stats');
+                const dailyRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', today);
+                
+                let globalUpdates = { views: increment(1) };
+                let dailyUpdates = { views: increment(1) };
+                
+                // التحقق مما إذا كان الزائر جديداً إجمالاً (للإحصائيات العامة)
+                if (!localStorage.getItem('tracked_unique_visitor')) {
+                    globalUpdates.uniqueVisitors = increment(1);
+                    localStorage.setItem('tracked_unique_visitor', 'true');
+                }
+                
+                // التحقق مما إذا كان الزائر جديداً لهذا اليوم تحديداً (للمنحنى البياني)
+                const todayUniqueKey = 'tracked_unique_' + today;
+                if (!localStorage.getItem(todayUniqueKey)) {
+                    dailyUpdates.uniqueVisitors = increment(1);
+                    localStorage.setItem(todayUniqueKey, 'true');
+                }
+                
+                try {
+                    // إرسال المشاهدة للإحصائيات العامة واليومية في نفس الوقت
+                    await setDoc(globalRef, globalUpdates, { merge: true });
+                    await setDoc(dailyRef, dailyUpdates, { merge: true });
+                    
+                    // تتبع مدة البقاء
+                    setInterval(async () => {
+                        if (document.visibilityState === 'visible') {
+                            await setDoc(globalRef, { timeSpent: increment(15) }, { merge: true });
+                            await setDoc(dailyRef, { timeSpent: increment(15) }, { merge: true });
+                        }
+                    }, 15000);
+                } catch(e) { console.error('Analytics Error:', e); }
+            }
+            trackVisit(); // تشغيل متتبع الزيارات
+
             // --- جلب إعدادات SEO وأدسنس ديناميكياً وحقنها في رأس الصفحة ---
             const seoDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo');
             getDoc(seoDocRef).then((seoSnap) => {
@@ -240,12 +280,6 @@
                     }
                     // دمج كود جوجل أدسنس تلقائياً
                     if (seoData.adsenseId) {
-                        // إضافة وسم التحقق (Meta Tag) برمجياً لضمان قبول المراجعة
-                        let adsenseMeta = document.createElement('meta');
-                        adsenseMeta.name = "google-adsense-account";
-                        adsenseMeta.content = seoData.adsenseId;
-                        document.head.appendChild(adsenseMeta);
-
                         let adsenseScript = document.createElement('script');
                         adsenseScript.async = true;
                         adsenseScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${seoData.adsenseId}`;

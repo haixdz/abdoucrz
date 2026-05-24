@@ -343,75 +343,87 @@
                     breadcrumbCat.href = `index.html?category=${encodeURIComponent(data.category)}`;
                     
                     document.getElementById('article-title').textContent = data.title;
+                    document.getElementById('app-name').textContent = data.title;
+                    document.getElementById('app-rating').textContent = data.rating || '4.5';
+                    document.getElementById('article-rating').textContent = data.rating || '4.5';
+                    document.getElementById('article-category').textContent = data.category;
+                    document.getElementById('article-downloads').textContent = data.downloads || '0';
+                    document.getElementById('article-date').textContent = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
+                    
+                    if (data.imageUrl) {
+                        document.getElementById('app-image').src = data.imageUrl;
+                    }
                     
                     const articleBody = document.getElementById('article-body');
                     if(data.content) {
-                        let formattedContent = data.content.replace(/\n\n/g, '</p><p class="mb-4">').replace(/\n/g, '<br>');
-                        if(!formattedContent.startsWith('<p>')) formattedContent = '<p class="mb-4">' + formattedContent + '</p>';
+                        // تقسيم النص إلى فقرات
+                        let paragraphs = data.content.split(/\n\n+/).filter(p => p.trim() !== '');
+                        let formattedContent = '';
+                        
+                        const inlineAdHtml = `
+                            <div class="my-8 w-full clear-both">
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[100px] border border-dashed border-gray-300 dark:border-gray-600">
+                                    <span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> إعلان مدمج (AdSense)</span>
+                                </div>
+                            </div>
+                        `;
+
+                        paragraphs.forEach((p, index) => {
+                            // تنظيف النص وتجميل العناوين والنصوص البارزة
+                            let cleanP = p.replace(/^###\s*(.*)$/gm, '<h3 class="text-xl md:text-2xl font-bold mt-10 mb-4 text-primary dark:text-primary">$1</h3>')
+                                          .replace(/^##\s*(.*)$/gm, '<h2 class="text-2xl md:text-3xl font-extrabold mt-12 mb-6 text-blue-600 dark:text-blue-400">$1</h2>')
+                                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 dark:text-white">$1</strong>')
+                                          .replace(/\*(.*?)\*/g, '<strong class="text-gray-900 dark:text-white">$1</strong>');
+                            
+                            // إذا كانت الفقرة عبارة عن عنوان صريح، لا نضعها في <p> حتى لا تفسد التنسيق
+                            if (cleanP.trim().startsWith('<h')) {
+                                formattedContent += cleanP;
+                            } else {
+                                formattedContent += `<p class="mb-6 leading-relaxed text-base md:text-lg">${cleanP.replace(/\n/g, '<br>')}</p>`;
+                            }
+                            
+                            // إضافة مساحة إعلانية بعد كل فقرتين لتجنب الإزعاج (ولكي تظهر الإعلانات بين العناوين)
+                            if ((index + 1) % 2 === 0 && index < paragraphs.length - 1) {
+                                formattedContent += inlineAdHtml;
+                            }
+                        });
                         articleBody.innerHTML = formattedContent;
                     } else {
                         articleBody.innerHTML = '<p>المحتوى غير متوفر حالياً.</p>';
                     }
 
-                    const downloadSection = document.getElementById('download-section');
-                    const downloadBtn = document.getElementById('download-btn');
-                    if (data.downloadUrl && data.downloadUrl.trim() !== '') {
-                        downloadBtn.href = data.downloadUrl;
-                        downloadSection.classList.remove('hidden'); 
-                        
-                        downloadBtn.addEventListener('click', async () => {
-                            if (!localStorage.getItem(`downloaded_${articleId}`)) {
-                                try {
-                                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId), {
-                                        actualDownloads: increment(1)
-                                    });
-                                    localStorage.setItem(`downloaded_${articleId}`, 'true');
-                                } catch (e) {
-                                    console.error("خطأ في تسجيل التحميل", e);
-                                }
+                    // --- جلب المقالات المشابهة ---
+                    const relatedContainer = document.getElementById('related-articles-container');
+                    let count = 0;
+                    relatedContainer.innerHTML = ''; // تفريغ الحاوي قبل الإضافة
+                    
+                    try {
+                        const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
+                        const querySnapshot = await getDocs(q);
+                        const allRelated = [];
+                        querySnapshot.forEach((d) => allRelated.push({ id: d.id, ...d.data() }));
+
+                        allRelated.forEach(rData => {
+                            if (rData.category === data.category && rData.id !== articleId && count < 2) {
+                                count++;
+                                relatedContainer.innerHTML += `
+                                    <a href="article.html?id=${rData.id}" class="group flex flex-col sm:flex-row items-center gap-3 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all">
+                                        <img src="${rData.imageUrl}" alt="${rData.title}" class="w-full sm:w-24 h-24 sm:h-20 object-cover rounded-lg group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600'">
+                                        <div class="flex-1 text-center sm:text-right mt-2 sm:mt-0">
+                                            <h4 class="font-bold text-gray-800 dark:text-gray-100 text-sm line-clamp-2 group-hover:text-primary transition-colors">${rData.title}</h4>
+                                            <span class="text-xs text-gray-400 mt-1 block"><i class="fa-solid fa-star text-yellow-400"></i> ${rData.rating || '4.5'}</span>
+                                        </div>
+                                    </a>
+                                `;
                             }
                         });
-                    } else {
-                        downloadSection.classList.add('hidden');
-                    }
-
-                    targetDownloadUrl = data.downloadUrl || "";
-                    document.getElementById('app-image').src = data.imageUrl || '';
-                    document.getElementById('app-name').textContent = data.title;
-                    document.getElementById('app-rating').textContent = data.rating || '0.0';
-                    document.getElementById('article-category').textContent = data.category;
-                    document.getElementById('article-rating').textContent = data.rating || '0.0';
-                    document.getElementById('article-downloads').textContent = data.downloads || '0';
-                    
-                    const dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
-                    document.getElementById('article-date').textContent = dateStr;
-
-                    const relatedQ = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
-                    const relatedSnapshot = await getDocs(relatedQ);
-                    const relatedContainer = document.getElementById('related-articles-container');
-                    relatedContainer.innerHTML = '';
-                    let count = 0;
-                    
-                    let allRelated = [];
-                    relatedSnapshot.forEach(rDoc => allRelated.push({ id: rDoc.id, ...rDoc.data() }));
-                    
-                    allRelated.forEach(rData => {
-                        if (rData.category === data.category && rData.id !== articleId && count < 2) {
-                            count++;
-                            relatedContainer.innerHTML += `
-                                <a href="article.html?id=${rData.id}" class="group flex flex-col sm:flex-row items-center gap-3 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all">
-                                    <img src="${rData.imageUrl}" alt="${rData.title}" class="w-full sm:w-24 h-24 sm:h-20 object-cover rounded-lg group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600'">
-                                    <div class="flex-1 text-center sm:text-right mt-2 sm:mt-0">
-                                        <h4 class="font-bold text-gray-800 dark:text-gray-100 text-sm line-clamp-2 group-hover:text-primary transition-colors">${rData.title}</h4>
-                                        <span class="text-xs text-gray-400 mt-1 block"><i class="fa-solid fa-star text-yellow-400"></i> ${rData.rating || '4.5'}</span>
-                                    </div>
-                                </a>
-                            `;
+                        
+                        if (count === 0) {
+                            relatedContainer.innerHTML = '<p class="text-sm text-gray-500">لا توجد مقالات مشابهة في هذا القسم حالياً.</p>';
                         }
-                    });
-                    
-                    if (count === 0) {
-                        relatedContainer.innerHTML = '<p class="text-sm text-gray-500">لا توجد مقالات مشابهة في هذا القسم حالياً.</p>';
+                    } catch (relatedErr) {
+                         console.error("Error fetching related articles: ", relatedErr);
+                         relatedContainer.innerHTML = '<p class="text-sm text-red-500">حدث خطأ أثناء جلب المقالات المشابهة.</p>';
                     }
 
                     document.getElementById('page-loader').classList.add('hidden');
@@ -440,72 +452,14 @@
         const statusTitle = document.getElementById('status-title');
         const boxIcon = document.getElementById('box-icon');
 
+        // التوجيه الفوري لصفحة التحميل (download.html)
         actionBtn.addEventListener('click', () => {
-            if (currentStep === 1) {
-                modalTitle.textContent = "الخطوة 1: فحص الملفات المرفقة";
-                modalDesc.textContent = "يرجى معاينة الإعلان أدناه لبدء العد التنازلي التلقائي";
-                openModal();
-            } else if (currentStep === 3) {
-                modalTitle.textContent = "الخطوة الأخيرة: جاري النقل الآمن للملف";
-                modalDesc.textContent = "تخطي الإعلان الأخير لبدء تنزيل الملف الخاص بك مباشرة";
-                openModal();
-            }
-        });
-
-        closeAdBtn.addEventListener('click', async () => {
-            closeModal();
-            
-            if (currentStep === 1) {
-                currentStep = 2;
-                actionBtn.disabled = true;
-                actionBtn.className = "w-full py-4 bg-gray-300 text-gray-500 font-bold rounded-xl flex items-center justify-center gap-2 cursor-not-allowed pointer-events-none transition-all text-lg";
-                actionBtn.innerHTML = `<span>جاري فحص الرابط...</span> <i class="fa-solid fa-spinner fa-spin"></i>`;
-                
-                statusTitle.textContent = "برجاء الانتظار قليلاً لحين انتهاء خوادمنا من تهيئة الملف الآمن...";
-                timerContainer.classList.remove('hidden');
-                progressContainer.classList.remove('hidden');
-                
-                let timeLeft = 17;
-                const totalTime = 17;
-                
-                const interval = setInterval(() => {
-                    timeLeft--;
-                    countdownElement.textContent = timeLeft;
-                    progressBar.style.width = ((totalTime - timeLeft) / totalTime) * 100 + '%';
-                    
-                    if (timeLeft <= 0) {
-                        clearInterval(interval);
-                        
-                        currentStep = 3;
-                        boxIcon.className = "fa-solid fa-circle-check text-green-500";
-                        statusTitle.innerHTML = '<span class="text-green-500 font-bold"><i class="fa-solid fa-check-circle"></i> تم الفحص والتحقق! الرابط جاهز للتنزيل الآن.</span>';
-                        timerContainer.classList.add('hidden');
-                        
-                        actionBtn.disabled = false;
-                        actionBtn.className = "w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-green-500/30 animate-bounce transition-all text-lg";
-                        actionBtn.innerHTML = `<span>الذهاب إلى رابط التنزيل</span> <i class="fa-solid fa-download"></i>`;
-                    }
-                }, 1000);
-                
-            } else if (currentStep === 3) {
-                // تسجيل التحميل الفعلي لحساب الإحصائيات قبل توجيه الزائر
-                const articleId = getArticleIdFromUrl();
-                if (articleId && !localStorage.getItem(`downloaded_${articleId}`)) {
-                    try {
-                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId), {
-                            actualDownloads: increment(1)
-                        });
-                        localStorage.setItem(`downloaded_${articleId}`, 'true');
-                    } catch (e) {
-                        console.error("خطأ في تسجيل التحميل", e);
-                    }
-                }
-
-                if (targetDownloadUrl) {
-                    window.location.href = targetDownloadUrl;
-                } else {
-                    alert("عذراً، رابط التنزيل النهائي غير متوفر.");
-                }
+            const articleId = getArticleIdFromUrl();
+            if (articleId) {
+                // نقل الزائر مباشرة لصفحة التحميل لتشغيل العداد هناك
+                window.location.href = `download.html?id=${articleId}`;
+            } else {
+                alert("عذراً، لم يتم تحديد المقال بشكل صحيح.");
             }
         });
 
