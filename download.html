@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جاري تحضير الرابط - abdoucrz</title>
+    <title>تجهيز الرابط - abdoucrz</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,100 +21,94 @@
             }
         }
     </script>
+    <style>
+        #progress-bar { transition: width 1s linear; }
+    </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col items-center">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col">
 
-    <!-- الهيدر البسيط -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm w-full transition-colors sticky top-0 z-40">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="index.html" class="hover:opacity-80 transition-opacity">
-                <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-10 object-contain dark:brightness-0 dark:invert">
-            </a>
-            <div id="header-status" class="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-4 py-1.5 rounded-full font-bold text-sm shadow-sm">
-                في انتظار البدء
+    <!-- الهيدر -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="flex items-center hover:opacity-80 transition-opacity">
+                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-12 md:h-14 object-contain dark:brightness-0 dark:invert">
+                    </a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="theme-toggle" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2">
+                        <i id="theme-toggle-dark-icon" class="fa-solid fa-moon hidden"></i>
+                        <i id="theme-toggle-light-icon" class="fa-solid fa-sun hidden"></i>
+                    </button>
+                    <a href="index.html" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-house"></i> الرئيسية
+                    </a>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- إعلان علوي كبير -->
-    <div class="w-full max-w-4xl px-4 mt-6">
-        <div class="bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-2 text-center h-[100px] md:h-[150px] flex flex-col justify-center items-center">
-            <span class="text-gray-500 font-bold"><i class="fa-solid fa-rectangle-ad text-2xl mb-2 block"></i> مساحة إعلانية علوية (AdSense)</span>
-        </div>
-    </div>
-
-    <!-- المحتوى الرئيسي -->
-    <main class="w-full max-w-3xl px-4 py-8 flex-1 flex flex-col items-center">
+    <!-- المحتوى الرئيسي للصفحة الأولى -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 py-10 w-full flex flex-col items-center">
         
-        <!-- صندوق معلومات التطبيق والعداد -->
-        <div id="app-info-card" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 w-full text-center relative overflow-hidden hidden transition-colors mb-8">
-            
-            <img id="app-image" src="" alt="صورة التطبيق" class="w-24 h-24 object-cover rounded-2xl mx-auto shadow-md mb-4 border-2 border-gray-100 dark:border-gray-700" onerror="this.src='https://via.placeholder.com/100'">
-            <h1 id="app-name" class="text-2xl font-bold mb-2 dark:text-white">جاري التحميل...</h1>
-            
-            <div class="flex justify-center items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-6 border-b border-gray-100 dark:border-gray-700 pb-6">
-                <span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-3 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-shield-check"></i> آمن ومفحوص</span>
-                <span class="font-bold flex items-center gap-1"><i class="fa-solid fa-server"></i> خادم سريع</span>
-            </div>
-
-            <!-- عرض جزء من الرابط لطمأنة الزائر -->
-            <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 mb-6 border border-gray-200 dark:border-gray-700">
-                <p class="text-xs text-gray-500 dark:text-gray-400 font-bold mb-1">الرابط الوجهة:</p>
-                <p id="target-url-preview" class="text-sm text-blue-500 font-mono break-all" dir="ltr">https://...</p>
-            </div>
-
-            <!-- منطقة الأزرار والعداد التفاعلي -->
-            <div id="action-container" class="mt-4">
-                
-                <!-- 1. زر بدء العداد -->
-                <button id="start-timer-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all text-lg flex items-center justify-center gap-2">
-                    <span>اضغط هنا لبدء تجهيز الرابط</span> <i class="fa-solid fa-hourglass-start"></i>
-                </button>
-                
-                <!-- 2. شاشة العداد (مخفية في البداية) -->
-                <div id="timer-display" class="hidden w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold py-4 rounded-xl border border-gray-300 dark:border-gray-600 text-lg flex flex-col items-center justify-center gap-2">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-spinner fa-spin text-primary"></i> 
-                        <span id="timer-text">الرجاء الانتظار 15 ثانية...</span>
-                    </div>
-                    <span class="text-xs text-gray-500 font-normal">يمكنك قراءة تفاصيل التطبيق بالأسفل ريثما ينتهي العداد</span>
-                </div>
-
-                <!-- 3. زر التحميل النهائي (مخفي في البداية) -->
-                <button id="final-download-btn" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-extrabold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-lg flex items-center justify-center gap-2 animate-bounce mt-4">
-                    <span>تحميل الملف الآن</span> <i class="fa-solid fa-download"></i>
-                </button>
-
-            </div>
+        <!-- إعلان علوي -->
+        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-24 flex flex-col justify-center items-center mb-8 shadow-inner">
+            <span class="text-[11px] font-bold mb-1">إعلان - Advertisement</span>
+            <i class="fa-solid fa-rectangle-ad text-2xl opacity-50"></i>
         </div>
 
-        <!-- إعلان وسطي ضخم -->
-        <div class="w-full mb-8">
-            <div class="bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-2 text-center h-[250px] flex flex-col justify-center items-center">
-                <span class="text-gray-500 font-bold"><i class="fa-solid fa-rectangle-ad text-3xl mb-2 block"></i> مساحة إعلانية وسطية (AdSense)</span>
+        <h1 id="page-main-title" class="text-2xl md:text-3xl font-bold mb-4 text-center dark:text-white">جاري فحص وتجهيز الرابط</h1>
+        <p class="text-gray-500 dark:text-gray-400 text-center mb-8 max-w-lg">يرجى الانتظار بينما نقوم بفحص الرابط الذي اخترته للتأكد من خلوه من الفيروسات وتجهيزه للتحميل بأقصى سرعة.</p>
+
+        <!-- صندوق المؤقت -->
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border-t-4 border-primary p-8 md:p-12 text-center transition-colors w-full relative overflow-hidden mb-8">
+            <div id="loader-icon" class="text-primary text-6xl mb-6">
+                <i class="fa-solid fa-shield-halved fa-beat-fade"></i>
             </div>
+            
+            <h3 id="status-title" class="text-2xl font-bold mb-6 dark:text-white">جاري التجهيز...</h3>
+            
+            <div id="timer-container" class="text-gray-600 dark:text-gray-300 font-bold mb-6 text-xl">
+                الرجاء الانتظار <span id="countdown" class="text-primary text-3xl mx-2">30</span> ثانية
+            </div>
+
+            <div id="progress-container" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-8 overflow-hidden flex justify-end">
+                <div id="progress-bar" class="bg-primary h-4 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <!-- الزر مخفي في البداية -->
+            <button id="next-btn" class="hidden w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all text-xl transform hover:-translate-y-1 animate-[pulse_2s_ease-in-out_infinite]">
+                <i class="fa-solid fa-link"></i> اضغط هنا لإعداد رابط مباشر
+            </button>
         </div>
 
-        <!-- نص المقال (لإبقاء الزائر متفاعلاً) -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8 w-full text-center md:text-right transition-colors">
-            <h3 class="text-xl font-bold border-r-4 border-primary pr-3 mb-6 dark:text-white">معلومات وتفاصيل التطبيق</h3>
-            <article id="article-body" class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
-                <div class="flex justify-center"><i class="fa-solid fa-spinner fa-spin text-3xl text-gray-400"></i></div>
+        <!-- حاوية المقال المجتزأ والإعلانات المدمجة -->
+        <div id="article-snippet-container" class="w-full bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-10 mb-8 hidden transition-colors">
+            <h3 class="text-xl font-bold mb-6 border-r-4 border-primary pr-3 dark:text-white">نبذة عن التطبيق</h3>
+            <article id="article-snippet" class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed text-right">
+                <!-- سيتم حقن جزء من المقال هنا تلقائياً -->
             </article>
         </div>
 
+        <!-- إعلان سفلي -->
+        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-24 flex flex-col justify-center items-center mt-4 shadow-inner">
+            <span class="text-[11px] font-bold mb-1">إعلان - Advertisement</span>
+            <i class="fa-solid fa-rectangle-ad text-2xl opacity-50"></i>
+        </div>
     </main>
 
-    <!-- إعلان سفلي ثابت -->
-    <div class="w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-2 mt-auto text-center sticky bottom-0 z-50 transition-colors">
-        <span class="text-xs text-gray-400 font-bold block mb-1">إعلان سفلي مثبت (AdSense)</span>
-        <div class="w-full max-w-3xl mx-auto h-[50px] bg-gray-100 dark:bg-gray-900 rounded border border-dashed border-gray-300 dark:border-gray-700"></div>
-    </div>
+    <!-- الفوتر -->
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto pt-8 pb-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm text-gray-500 dark:text-gray-400">© 2026 جميع الحقوق محفوظة لمدونة abdoucrz.</p>
+        </div>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
@@ -130,133 +124,120 @@
         const db = getFirestore(app);
         const appId = 'abdoucrz_blog';
 
-        let actualDownloadUrl = "";
-        let articleId = new URLSearchParams(window.location.search).get('id');
-
-        // الوضع الليلي الافتراضي
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
+        // استخراج معرف المقال ورقم الرابط من الـ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleId = urlParams.get('id');
+        const linkIdx = urlParams.get('linkIdx') || 0;
 
         signInAnonymously(auth).then(async () => {
+            // جلب الإعدادات (AdSense)
+            try {
+                const seoSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo'));
+                if (seoSnap.exists()) {
+                    const seoData = seoSnap.data();
+                    if (seoData.adsenseId) {
+                        let adsenseScript = document.createElement('script');
+                        adsenseScript.async = true;
+                        adsenseScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${seoData.adsenseId}`;
+                        adsenseScript.crossOrigin = "anonymous";
+                        document.head.appendChild(adsenseScript);
+                    }
+                }
+            } catch (err) {}
+
             if (!articleId) {
-                document.getElementById('app-name').textContent = "رابط غير صالح";
-                document.getElementById('article-body').innerHTML = '<p class="text-red-500 font-bold">عذراً، الرابط غير صحيح.</p>';
+                document.getElementById('status-title').textContent = "خطأ: لم يتم تحديد المقال!";
+                document.getElementById('timer-container').classList.add('hidden');
+                document.getElementById('progress-container').classList.add('hidden');
                 return;
             }
 
+            // --- جلب بيانات المقال لاقتطاع جزء منه وعرضه ---
             try {
-                const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId));
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId);
+                const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    document.getElementById('page-main-title').textContent = "تجهيز رابط: " + data.title;
                     
-                    document.getElementById('app-info-card').classList.remove('hidden');
-                    document.getElementById('app-name').textContent = data.title;
-                    document.getElementById('app-image').src = data.imageUrl || '';
-                    
-                    actualDownloadUrl = data.downloadUrl || "";
-                    
-                    // إخفاء جزء من الرابط للحماية والإثارة
-                    if (actualDownloadUrl) {
-                        try {
-                            const urlObj = new URL(actualDownloadUrl);
-                            const host = urlObj.hostname;
-                            const maskedUrl = `https://${host.substring(0, 5)}...${urlObj.pathname.substring(urlObj.pathname.length - 10)}`;
-                            document.getElementById('target-url-preview').textContent = maskedUrl;
-                        } catch (e) {
-                            document.getElementById('target-url-preview').textContent = actualDownloadUrl.substring(0, 20) + '...';
-                        }
-                    } else {
-                        document.getElementById('target-url-preview').textContent = "الرابط غير متوفر";
-                    }
-
-                    // --- جلب وعرض نص المقال مع الإعلانات المدمجة ---
-                    const articleBody = document.getElementById('article-body');
-                    if(data.content) {
+                    if (data.content) {
                         let paragraphs = data.content.split(/\n\n+/).filter(p => p.trim() !== '');
+                        // نأخذ أول 3 فقرات فقط كنبذة لإبقاء الزائر متفاعلاً
+                        let snippetParas = paragraphs.slice(0, Math.min(3, paragraphs.length));
                         let formattedContent = '';
-                        
-                        const inlineAdHtml = `
-                            <div class="my-6 w-full clear-both">
-                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[100px] border border-dashed border-gray-300 dark:border-gray-600">
-                                    <span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> إعلان مدمج (AdSense)</span>
-                                </div>
-                            </div>
-                        `;
+                        const inlineAdHtml = `<div class="my-6 w-full clear-both"><div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[100px] border border-dashed border-gray-300 dark:border-gray-600"><span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> إعلان مدمج (AdSense)</span></div></div>`;
 
-                        paragraphs.forEach((p, index) => {
-                            formattedContent += `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`;
-                            if (index < paragraphs.length - 1) {
+                        snippetParas.forEach((p, index) => {
+                            let cleanP = p.replace(/^###\s*(.*)$/gm, '<h3 class="text-xl font-bold mt-6 mb-3 text-primary dark:text-primary">$1</h3>')
+                                          .replace(/^##\s*(.*)$/gm, '<h2 class="text-2xl font-extrabold mt-8 mb-4 text-blue-600 dark:text-blue-400">$1</h2>')
+                                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 dark:text-white">$1</strong>');
+                            
+                            if (cleanP.trim().startsWith('<h')) {
+                                formattedContent += cleanP;
+                            } else {
+                                formattedContent += `<p class="mb-4 leading-relaxed">${cleanP.replace(/\n/g, '<br>')}</p>`;
+                            }
+
+                            // إضافة مساحة إعلانية بعد الفقرة الأولى
+                            if (index === 0 && snippetParas.length > 1) {
                                 formattedContent += inlineAdHtml;
                             }
                         });
-                        articleBody.innerHTML = formattedContent;
-                    } else {
-                        articleBody.innerHTML = '<p>المحتوى غير متوفر حالياً.</p>';
-                    }
-
-                    // --- برمجة العداد التنازلي التفاعلي ---
-                    const startBtn = document.getElementById('start-timer-btn');
-                    const timerDisplay = document.getElementById('timer-display');
-                    const timerText = document.getElementById('timer-text');
-                    const finalBtn = document.getElementById('final-download-btn');
-                    const headerStatus = document.getElementById('header-status');
-
-                    startBtn.addEventListener('click', () => {
-                        // إخفاء زر البدء وإظهار العداد
-                        startBtn.classList.add('hidden');
-                        timerDisplay.classList.remove('hidden');
                         
-                        headerStatus.classList.replace('bg-gray-200', 'bg-primary');
-                        headerStatus.classList.replace('dark:bg-gray-700', 'bg-primary');
-                        headerStatus.classList.replace('text-gray-600', 'text-white');
-                        headerStatus.classList.replace('dark:text-gray-300', 'text-white');
-                        headerStatus.classList.add('animate-pulse');
-                        headerStatus.textContent = "يتم التجهيز...";
-
-                        let MathTime = 15; // عدد ثواني الانتظار (تستطيع تغييره لزيادة مدة بقاء الزائر)
-                        timerText.textContent = `الرجاء الانتظار ${MathTime} ثانية...`;
-
-                        const timer = setInterval(() => {
-                            MathTime--;
-                            timerText.textContent = `الرجاء الانتظار ${MathTime} ثانية...`;
-                            
-                            if (MathTime <= 0) {
-                                clearInterval(timer);
-                                // إخفاء العداد وإظهار زر التحميل النهائي
-                                timerDisplay.classList.add('hidden');
-                                finalBtn.classList.remove('hidden');
-                                
-                                headerStatus.textContent = "الرابط جاهز!";
-                                headerStatus.classList.remove('animate-pulse');
-                                headerStatus.classList.replace('bg-primary', 'bg-green-500');
-                            }
-                        }, 1000);
-                    });
-
-                    // برمجة زر التحميل النهائي
-                    finalBtn.addEventListener('click', async () => {
-                        if (!localStorage.getItem(`downloaded_${articleId}`)) {
-                            try {
-                                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId), {
-                                    actualDownloads: increment(1)
-                                });
-                                localStorage.setItem(`downloaded_${articleId}`, 'true');
-                            } catch (e) {
-                                console.error(e);
-                            }
-                        }
-                        if (actualDownloadUrl) window.location.href = actualDownloadUrl;
-                    });
-
-                } else {
-                    document.getElementById('app-name').textContent = "المقال غير موجود";
-                    document.getElementById('article-body').innerHTML = '<p class="text-red-500 font-bold">هذا المقال لم يعد متاحاً.</p>';
+                        document.getElementById('article-snippet').innerHTML = formattedContent;
+                        document.getElementById('article-snippet-container').classList.remove('hidden');
+                    }
                 }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('app-name').textContent = "حدث خطأ في الاتصال";
-            }
+            } catch (e) { console.error("Error fetching article snippet:", e); }
+
+            // برمجة المؤقت 30 ثانية
+            let timeLeft = 30;
+            const totalTime = 30;
+            const countdownEl = document.getElementById('countdown');
+            const progressBar = document.getElementById('progress-bar');
+            const nextBtn = document.getElementById('next-btn');
+
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = timeLeft;
+                
+                const progressPercentage = ((totalTime - timeLeft) / totalTime) * 100;
+                progressBar.style.width = progressPercentage + '%';
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer-container').classList.add('hidden');
+                    document.getElementById('progress-container').classList.add('hidden');
+                    document.getElementById('loader-icon').innerHTML = '<i class="fa-solid fa-circle-check text-green-500"></i>';
+                    document.getElementById('status-title').textContent = "تم الفحص بنجاح!";
+                    
+                    // إظهار زر الانتقال للصفحة الثانية
+                    nextBtn.classList.remove('hidden');
+                    nextBtn.classList.add('flex');
+                }
+            }, 1000);
+
+            // حدث الضغط على الزر: تمرير articleId و linkIdx معاً
+            nextBtn.addEventListener('click', () => {
+                window.location.href = `download_final.html?id=${articleId}&linkIdx=${linkIdx}`;
+            });
+        });
+
+        // الوضع الليلي
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden'); document.documentElement.classList.add('dark');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden'); document.documentElement.classList.remove('dark');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden'); themeToggleLightIcon.classList.toggle('hidden');
+            if (localStorage.getItem('color-theme') === 'light') { document.documentElement.classList.add('dark'); localStorage.setItem('color-theme', 'dark'); } 
+            else { document.documentElement.classList.remove('dark'); localStorage.setItem('color-theme', 'light'); }
         });
     </script>
 </body>

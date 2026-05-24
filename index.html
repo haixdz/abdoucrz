@@ -278,6 +278,15 @@
                         metaKeywords.content = seoData.keywords;
                         document.head.appendChild(metaKeywords);
                     }
+                    
+                    // إضافة كود إثبات الملكية (Google Site Verification)
+                    if (seoData.siteVerification) {
+                        let metaVerification = document.createElement('meta');
+                        metaVerification.name = "google-site-verification";
+                        metaVerification.content = seoData.siteVerification.trim();
+                        document.head.appendChild(metaVerification);
+                    }
+
                     // دمج كود جوجل أدسنس تلقائياً
                     if (seoData.adsenseId) {
                         let adsenseScript = document.createElement('script');
