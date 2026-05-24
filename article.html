@@ -87,7 +87,7 @@
             <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-gray-500 dark:text-gray-400 font-bold border-t border-gray-100 dark:border-gray-700 pt-6 transition-colors">
                 <span id="article-category" class="bg-primary/10 text-primary px-3 py-1 rounded-full">القسم</span>
                 <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-400"></i> <span id="article-rating">0.0</span></span>
-                <span class="flex items-center gap-1"><i class="fa-solid fa-download text-green-500"></i> <span id="article-downloads">0</span> تحميل</span>
+                <span id="article-downloads-badge" class="flex items-center gap-1"><i class="fa-solid fa-download text-green-500"></i> <span id="article-downloads">0</span> تحميل</span>
                 <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> <span id="article-date">التاريخ</span></span>
             </div>
         </div>
@@ -117,7 +117,7 @@
         </div>
 
         <!-- صندوق التحميل المتقدم (الروابط المتعددة) -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div id="download-section-wrapper" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="hidden md:flex flex-col justify-center items-center bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-3xl p-2 h-full min-h-[300px]">
                 <span class="text-xs writing-vertical">إعلان - Ad</span>
             </div>
@@ -144,7 +144,8 @@
             </div>
         </div>
 
-        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-8">
+        <!-- إعلان سفلي (مربوط بصندوق التحميل) -->
+        <div id="download-bottom-ad" class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-8">
             <span class="text-xs">إعلان - Advertisement</span>
         </div>
     </div>
@@ -258,19 +259,18 @@
                         articleBody.innerHTML = formattedContent;
                     } else { articleBody.innerHTML = '<p>المحتوى غير متوفر حالياً.</p>'; }
 
-                    // --- توليد أزرار التحميل المتعددة (النظام الجديد) ---
+                    // --- توليد أزرار التحميل المتعددة (النظام الذكي) ---
                     const actionBtnContainer = document.getElementById('action-buttons-container');
                     actionBtnContainer.innerHTML = '';
                     
-                    // استخراج الروابط من المصفوفة الجديدة، أو من الرابط القديم كحل احتياطي
                     let links = data.downloadLinks || [];
                     if (links.length === 0 && data.downloadUrl) {
                         links = [{ name: 'تحميل مباشر', url: data.downloadUrl }];
                     }
                     
+                    // إذا وجد روابط، سيطبعها كالمعتاد. وإذا لم يجد، سيخفي صندوق التحميل بالكامل.
                     if (links.length > 0) {
                         links.forEach((link, index) => {
-                            // إضافة زر لكل رابط وتمرير الـ index في الرابط
                             actionBtnContainer.innerHTML += `
                                 <button onclick="goToDownload('${articleId}', ${index})" class="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all text-lg mb-2">
                                     <span>${link.name}</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
@@ -278,7 +278,16 @@
                             `;
                         });
                     } else {
-                        actionBtnContainer.innerHTML = '<p class="text-red-500 font-bold">لا توجد روابط تحميل متاحة.</p>';
+                        // إخفاء صندوق التحميل والإعلان السفلي له
+                        const downloadSection = document.getElementById('download-section-wrapper');
+                        if (downloadSection) downloadSection.style.display = 'none';
+                        
+                        const bottomAd = document.getElementById('download-bottom-ad');
+                        if (bottomAd) bottomAd.style.display = 'none';
+
+                        // إخفاء نص "عدد التحميلات" من أعلى المقال ليكون أكثر منطقية للأخبار
+                        const downloadsBadge = document.getElementById('article-downloads-badge');
+                        if (downloadsBadge) downloadsBadge.style.display = 'none';
                     }
 
                     // جلب المقالات المشابهة

@@ -89,7 +89,8 @@
             measurementId: "G-8WF00TW430"
         };
 
-        const app = initializeApp(firebaseConfig);
+        // تم إضافة اسم للاتصال "AdminPanel" لعزل جلسة المدير عن الزوار
+        const app = initializeApp(firebaseConfig, "AdminPanel");
         const auth = getAuth(app);
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {

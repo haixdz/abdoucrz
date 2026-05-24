@@ -68,6 +68,9 @@
             <button onclick="switchSection('settings')" id="nav-settings" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
                 <i class="fa-solid fa-gear w-5"></i> الإعدادات
             </button>
+            <button onclick="switchSection('account')" id="nav-account" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
+                <i class="fa-solid fa-user-shield w-5"></i> حسابي (الأمان)
+            </button>
         </nav>
         
         <div class="p-4 border-t border-gray-800 flex flex-col gap-2">
@@ -219,8 +222,8 @@
 
                     <!-- نظام الروابط المتعددة الديناميكي -->
                     <div class="mb-6 p-5 bg-green-900/10 border border-green-800/30 rounded-xl">
-                        <label class="block text-sm font-semibold text-green-400 mb-2">روابط التحميل المباشرة *</label>
-                        <p class="text-xs text-gray-400 mb-3">يمكنك إضافة أكثر من رابط (للأندرويد، للآيفون، للكمبيوتر...)، وكل رابط سيظهر كزر منفصل.</p>
+                        <label class="block text-sm font-semibold text-green-400 mb-2">روابط التحميل المباشرة (اختياري)</label>
+                        <p class="text-xs text-gray-400 mb-3">يمكنك إضافة روابط متعددة (للأندرويد، للكمبيوتر...)، وإذا تركتها فارغة سيتم نشر المقال كـ "مقال للقراءة فقط" وسيختفي صندوق التحميل.</p>
                         
                         <div id="links-container" class="space-y-3 mb-3">
                             <!-- سيتم إضافة الروابط هنا -->
@@ -404,13 +407,42 @@
                     </form>
                 </div>
             </section>
+
+            <!-- 6. إعدادات الحساب (تغيير الايميل وكلمة المرور) -->
+            <section id="section-account" class="section-content">
+                <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8">
+                    <h3 class="text-xl font-bold text-white mb-6 border-r-4 border-primary pr-3 flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield text-primary"></i> تغيير بيانات الدخول (الأمان)
+                    </h3>
+                    
+                    <div class="mb-6 p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-xl flex items-start gap-3 text-yellow-500 text-sm">
+                        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                        <p>تنبيه أمني: لتغيير بريدك الإلكتروني أو كلمة المرور، يجب أن تكون قد سجلت الدخول حديثاً. إذا ظهر لك خطأ (Requires Recent Login)، يرجى تسجيل الخروج ثم الدخول مجدداً والمحاولة مرة أخرى.</p>
+                    </div>
+
+                    <form id="accountForm">
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">البريد الإلكتروني الجديد (اختياري)</label>
+                            <input type="email" id="newEmail" placeholder="البريد الحالي سيبقى كما هو إذا تركته فارغاً..." class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
+                        </div>
+                        <div class="mb-8">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">كلمة المرور الجديدة (اختياري)</label>
+                            <input type="password" id="newPassword" placeholder="اكتب كلمة مرور قوية (6 أحرف على الأقل)..." class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
+                        </div>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-shield-halved"></i> تحديث بيانات الحساب
+                        </button>
+                    </form>
+                </div>
+            </section>
+
         </div>
     </main>
 
     <!-- Firebase & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, verifyBeforeUpdateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, onSnapshot, query, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -422,7 +454,7 @@
             appId: "1:305213328928:web:47136d037fbe88002af645"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig, "AdminPanel");
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = 'abdoucrz_blog';
@@ -453,7 +485,7 @@
             document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
             
-            const titles = {'stats': 'الإحصائيات', 'create': 'كتابة مقال', 'manage': 'إدارة المقالات', 'links': 'روابط البايو', 'settings': 'الإعدادات'};
+            const titles = {'stats': 'الإحصائيات', 'create': 'كتابة مقال', 'manage': 'إدارة المقالات', 'links': 'روابط البايو', 'settings': 'الإعدادات', 'account': 'إعدادات الحساب والأمان'};
             document.getElementById('header-title').textContent = titles[sectionId];
             if (window.innerWidth < 768) toggleMobileSidebar(false);
         };
@@ -486,14 +518,14 @@
             return data.data.url;
         }
 
-        // --- نظام الروابط المتعددة ---
+        // --- نظام الروابط المتعددة (تم إلغاء required ليدعم المقالات الإخبارية) ---
         window.addNewLinkField = function(name = '', url = '') {
             const container = document.getElementById('links-container');
             const div = document.createElement('div');
             div.className = 'flex flex-col sm:flex-row gap-2 link-item relative bg-[#1e293b] p-3 rounded-xl border border-gray-700/50';
             div.innerHTML = `
-                <input type="text" placeholder="اسم الزر (مثال: تحميل للأندرويد)" value="${name}" required class="w-full sm:w-1/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-name">
-                <input type="url" placeholder="الرابط المباشر (https://...)" value="${url}" required class="w-full sm:w-2/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-url" dir="ltr">
+                <input type="text" placeholder="اسم الزر (مثال: تحميل للأندرويد)" value="${name}" class="w-full sm:w-1/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-name">
+                <input type="url" placeholder="الرابط المباشر (https://...)" value="${url}" class="w-full sm:w-2/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-url" dir="ltr">
                 <button type="button" onclick="this.parentElement.remove()" class="bg-red-900/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center shadow-sm" title="حذف هذا الرابط"><i class="fa-solid fa-trash-can"></i></button>
             `;
             container.appendChild(div);
@@ -554,7 +586,6 @@
                     const actualD = data.actualDownloads || 0; totalActualDownloads += actualD;
                     const dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
 
-                    // تمييز المقال المخفي بعلامة بصرية
                     const isHiddenIcon = data.isUnlisted ? '<span class="text-xs bg-red-900/50 text-red-400 px-2 py-1 rounded ml-2" title="مقال مخفي"><i class="fa-solid fa-eye-slash"></i></span> ' : '';
 
                     tbody.innerHTML += `
@@ -594,10 +625,9 @@
                         document.getElementById('rating').value = data.rating || '4.5';
                         document.getElementById('downloads').value = data.downloads || '';
                         document.getElementById('content').value = data.content || '';
-                        document.getElementById('isUnlisted').checked = data.isUnlisted || false; // سحب حالة المقال المخفي
+                        document.getElementById('isUnlisted').checked = data.isUnlisted || false; 
                         if (data.imageUrl) { document.getElementById('imagePreview').src = data.imageUrl; document.getElementById('imagePreviewContainer').classList.remove('hidden'); }
                         
-                        // تعبئة الروابط المتعددة
                         document.getElementById('links-container').innerHTML = '';
                         if (data.downloadLinks && data.downloadLinks.length > 0) {
                             data.downloadLinks.forEach(link => addNewLinkField(link.name, link.url));
@@ -620,32 +650,28 @@
                 window.currentEditId = null; document.getElementById('addForm').reset();
                 document.getElementById('imagePreviewContainer').classList.add('hidden');
                 document.getElementById('links-container').innerHTML = ''; addNewLinkField();
-                document.getElementById('isUnlisted').checked = false; // إعادة تعيين حالة المخفي
+                document.getElementById('isUnlisted').checked = false; 
                 document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-primary"></i> الذكاء الاصطناعي';
                 document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> نشر المقال';
                 document.getElementById('cancelEditBtn').classList.add('hidden');
                 switchSection('manage');
             });
 
-            // ضمان وجود حقل واحد على الأقل عند التحميل
             addNewLinkField();
 
-            // --- 2. نشر المقال (مع إضافة ميزة المقال المخفي) ---
+            // --- 2. نشر المقال (تم إزالة شرط إجبارية الروابط) ---
             document.getElementById('addForm').addEventListener('submit', async (e) => {
                 e.preventDefault(); const btn = document.getElementById('submitArticleBtn'); const orig = btn.innerHTML;
                 btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
                 
                 let downloadLinks = [];
                 document.querySelectorAll('.link-item').forEach(item => {
-                    const name = item.querySelector('.link-name').value;
-                    const url = item.querySelector('.link-url').value;
+                    const name = item.querySelector('.link-name').value.trim();
+                    const url = item.querySelector('.link-url').value.trim();
                     if(name && url) downloadLinks.push({ name, url });
                 });
 
-                if(downloadLinks.length === 0) {
-                    showToast("يجب إضافة رابط تحميل واحد على الأقل!", true);
-                    btn.disabled = false; btn.innerHTML = orig; return;
-                }
+                // تم إزالة المنع هنا: إذا كانت downloadLinks فارغة، سيتم الحفظ بشكل عادي لتكون مقالة للقراءة فقط
 
                 try {
                     const data = { 
@@ -656,7 +682,7 @@
                         rating: document.getElementById('rating').value, 
                         downloads: document.getElementById('downloads').value, 
                         downloadLinks: downloadLinks,
-                        isUnlisted: document.getElementById('isUnlisted').checked // حفظ حالة الإخفاء في قاعدة البيانات
+                        isUnlisted: document.getElementById('isUnlisted').checked 
                     };
                     if (window.currentEditId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', window.currentEditId), data); showToast("تم التحديث!"); } 
                     else { data.actualDownloads = 0; data.createdAt = serverTimestamp(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), data); showToast("تم النشر!"); }
@@ -724,6 +750,61 @@
             window.deleteBioLink = async function(docId) { if(confirm('متأكد؟')) { try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'biolinks', docId)); showToast("تم الحذف"); } catch (e) {} } };
             document.getElementById('bioLinkImageUpload').addEventListener('change', async (e) => { const file = e.target.files[0]; if (!file) return; const btn = document.getElementById('uploadBioLinkImageBtn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; try { const url = await uploadToImgBB(file); document.getElementById('bioLinkImage').value = url; showToast("تم الرفع!"); } catch (e) {} finally { btn.disabled = false; btn.innerHTML = orig; e.target.value = ''; } });
             document.getElementById('addBioLinkForm').addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '...'; let rawIcon = document.getElementById('bioLinkIcon').value; let finalIconClass = ""; if (rawIcon) { const match = rawIcon.match(/class=["'](.*?)["']/); finalIconClass = match ? match[1] : rawIcon.replace(/<[^>]*>?/gm, '').trim(); } try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'biolinks'), { title: document.getElementById('bioLinkTitle').value, url: document.getElementById('bioLinkUrl').value, imageUrl: document.getElementById('bioLinkImage').value, iconClass: finalIconClass, isHighlighted: document.getElementById('bioLinkHighlight').checked, clicks: 0, createdAt: serverTimestamp() }); showToast("تم الإضافة!"); e.target.reset(); } catch (err) {} finally { btn.disabled = false; btn.innerHTML = orig; } });
+
+            // --- 7. إعدادات الحساب والأمان (تحديث البريد وكلمة المرور) ---
+            document.getElementById('accountForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button'); 
+                const orig = btn.innerHTML; 
+                btn.disabled = true; 
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحديث...';
+                
+                const newEmail = document.getElementById('newEmail').value.trim();
+                const newPassword = document.getElementById('newPassword').value;
+                const user = auth.currentUser;
+
+                try {
+                    let updated = false;
+                    let emailVerificationSent = false;
+                    
+                    if (newEmail && newEmail !== user.email) {
+                        await verifyBeforeUpdateEmail(user, newEmail);
+                        emailVerificationSent = true;
+                        updated = true;
+                    }
+                    
+                    if (newPassword) {
+                        if(newPassword.length < 6) {
+                            showToast("كلمة المرور يجب أن تكون 6 أحرف على الأقل", true);
+                            btn.disabled = false; btn.innerHTML = orig;
+                            return;
+                        }
+                        await updatePassword(user, newPassword);
+                        updated = true;
+                    }
+                    
+                    if(updated) {
+                        if (emailVerificationSent) {
+                            showToast("تم إرسال رابط تأكيد إلى بريدك الجديد. يرجى التحقق منه لتأكيد التغيير!");
+                        } else {
+                            showToast("تم تحديث بيانات الحساب بنجاح!");
+                        }
+                        e.target.reset();
+                    } else {
+                        showToast("لم تقم بإدخال أي بيانات جديدة", true);
+                    }
+                } catch (error) {
+                    console.error("Account Update Error:", error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        showToast("يرجى تسجيل الخروج والدخول مجدداً لتأكيد هويتك أولاً", true);
+                    } else {
+                        showToast("خطأ: " + error.message, true);
+                    }
+                } finally {
+                    btn.disabled = false; 
+                    btn.innerHTML = orig;
+                }
+            });
         }
     </script>
 </body>
