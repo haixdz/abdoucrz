@@ -105,18 +105,7 @@
             <button onclick="window.open('https://t.me/share/url?url='+encodeURIComponent(window.location.href)+'&text='+encodeURIComponent(document.title), '_blank')" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm"><i class="fa-brands fa-telegram"></i></button>
         </div>
 
-        <div class="mb-10">
-            <h3 class="text-xl font-bold border-r-4 border-primary pr-3 mb-6 dark:text-white">مواضيع ذات صلة</h3>
-            <div id="related-articles-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin"></i> جاري جلب المقالات...</div>
-            </div>
-        </div>
-
-        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-8">
-            <span class="text-xs">إعلان - Advertisement</span>
-        </div>
-
-        <!-- صندوق التحميل المتقدم (الروابط المتعددة) -->
+        <!-- صندوق التحميل المتقدم (تم نقله إلى هنا مباشرة أسفل المقال) -->
         <div id="download-section-wrapper" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="hidden md:flex flex-col justify-center items-center bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-3xl p-2 h-full min-h-[300px]">
                 <span class="text-xs writing-vertical">إعلان - Ad</span>
@@ -145,7 +134,20 @@
         </div>
 
         <!-- إعلان سفلي (مربوط بصندوق التحميل) -->
-        <div id="download-bottom-ad" class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-8">
+        <div id="download-bottom-ad" class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-10">
+            <span class="text-xs">إعلان - Advertisement</span>
+        </div>
+
+        <!-- قسم المقالات ذات الصلة (تم نقله إلى هنا أسفل التحميل) -->
+        <div class="mb-10">
+            <h3 class="text-xl font-bold border-r-4 border-primary pr-3 mb-6 dark:text-white">مواضيع ذات صلة</h3>
+            <div id="related-articles-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin"></i> جاري جلب المقالات...</div>
+            </div>
+        </div>
+
+        <!-- إعلان نهاية المقال -->
+        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-8">
             <span class="text-xs">إعلان - Advertisement</span>
         </div>
     </div>
