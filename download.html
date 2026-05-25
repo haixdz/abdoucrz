@@ -27,6 +27,18 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col">
 
+    <!-- نافذة مانع الإعلانات (AdBlock Detector Overlay) -->
+    <div id="adblock-warning" class="fixed inset-0 bg-black/90 z-50 items-center justify-center hidden backdrop-blur-md">
+        <div class="bg-white dark:bg-[#1e293b] p-8 rounded-3xl max-w-md w-full text-center border-t-4 border-red-500 shadow-2xl mx-4 transform transition-all">
+            <i class="fa-solid fa-hand-shield text-6xl text-red-500 mb-6 animate-pulse"></i>
+            <h2 class="text-2xl font-extrabold text-gray-800 dark:text-white mb-4">مانع الإعلانات مُفعل!</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-8 font-semibold leading-relaxed">عذراً صديقي، نحن نعتمد على الإعلانات لنستمر في تقديم هذه الروابط المجانية لك. يرجى إيقاف إضافة <b>AdBlock</b> مؤقتاً لتتمكن من إكمال التحميل.</p>
+            <button onclick="window.location.reload()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-lg w-full flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> لقد قمت بإيقافه، تحديث الصفحة
+            </button>
+        </div>
+    </div>
+
     <!-- الهيدر -->
     <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -128,6 +140,28 @@
         const urlParams = new URLSearchParams(window.location.search);
         const articleId = urlParams.get('id');
         const linkIdx = urlParams.get('linkIdx') || 0;
+
+        // --- نظام كشف مانع الإعلانات (Anti-Adblock) المتقدم ---
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                // إنشاء عنصر وهمي بخصائص إعلانية معروفة للـ Adblockers
+                let adTest = document.createElement('div');
+                adTest.innerHTML = '&nbsp;';
+                adTest.className = 'adsbox ad-placement doubleclick-ad';
+                adTest.style.position = 'absolute';
+                adTest.style.left = '-9999px';
+                document.body.appendChild(adTest);
+                
+                // فحص إذا كان مانع الإعلانات قد أخفى العنصر أو دمره
+                if (adTest.offsetHeight === 0 || window.getComputedStyle(adTest).display === 'none') {
+                    const overlay = document.getElementById('adblock-warning');
+                    overlay.classList.remove('hidden');
+                    overlay.classList.add('flex');
+                    document.body.style.overflow = 'hidden'; // منع النزول بالماوس
+                }
+                adTest.remove();
+            }, 1000); // ننتظر ثانية لضمان أن المانع قد عمل
+        });
 
         signInAnonymously(auth).then(async () => {
             // جلب الإعدادات (AdSense)

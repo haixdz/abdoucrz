@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحميل التطبيقات والألعاب - abdoucrz</title>
     
+    <!-- Meta Tags for Social Sharing (Open Graph) يتم تحديثها عبر الجافاسكريبت -->
+    <meta property="og:title" content="تحميل التطبيقات - abdoucrz" id="og-title">
+    <meta property="og:description" content="قم بتحميل أحدث التطبيقات والألعاب بروابط مباشرة وآمنة." id="og-desc">
+    <meta property="og:image" content="https://i.ibb.co/kgq5vmvH/crz.webp" id="og-image">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -21,8 +28,46 @@
             }
         }
     </script>
+    <style>
+        .trending-item:hover .trending-img { transform: scale(1.1); }
+        /* تحسين التمرير السلس للفهرس */
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- نافذة إشعار منبثقة (Toast) للنسخ والنجاح -->
+    <div id="copy-toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl font-bold flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none translate-y-[-20px]">
+        <i id="toast-icon" class="fa-solid fa-check-circle text-green-400"></i> <span id="toast-msg">تم نسخ الرابط بنجاح!</span>
+    </div>
+
+    <!-- نافذة الإبلاغ عن مشكلة (Modal) -->
+    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex justify-center items-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-md mx-4 transform scale-95 transition-transform duration-300 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold mb-4 text-red-500 dark:text-red-400 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> إبلاغ عن مشكلة</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">هل واجهت مشكلة في هذا المقال؟ يرجى إخبارنا ليتم إصلاحها فوراً.</p>
+            <form id="report-form">
+                <div class="flex flex-col gap-3 mb-6">
+                    <label class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-600 hover:border-red-400 transition-colors">
+                        <input type="radio" name="reportReason" value="رابط التحميل معطل ولا يعمل" required class="accent-red-500 w-4 h-4">
+                        <span class="text-sm font-semibold">رابط التحميل معطل ولا يعمل</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-600 hover:border-red-400 transition-colors">
+                        <input type="radio" name="reportReason" value="توجد نسخة أحدث من التطبيق" required class="accent-red-500 w-4 h-4">
+                        <span class="text-sm font-semibold">توجد نسخة أحدث من التطبيق</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-600 hover:border-red-400 transition-colors">
+                        <input type="radio" name="reportReason" value="محتوى المقال غير دقيق" required class="accent-red-500 w-4 h-4">
+                        <span class="text-sm font-semibold">محتوى المقال غير دقيق</span>
+                    </label>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeReportModal()" class="flex-1 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">إلغاء</button>
+                    <button type="submit" id="submit-report-btn" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-md flex items-center justify-center gap-2">إرسال البلاغ</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- الهيدر الأصلي للمدونة -->
     <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 transition-colors">
@@ -48,109 +93,154 @@
 
     <div id="page-loader" class="flex-1 flex flex-col justify-center items-center py-20">
         <i class="fa-solid fa-circle-notch fa-spin text-5xl text-primary mb-4"></i>
-        <p class="text-gray-500 font-semibold dark:text-gray-400">جاري فحص الرابط وتجهيز البيانات...</p>
+        <p class="text-gray-500 font-semibold dark:text-gray-400">جاري تجهيز البيانات...</p>
     </div>
 
-    <div id="article-content" class="hidden flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 w-full">
+    <!-- المحتوى الرئيسي (مقسم لعمودين) -->
+    <main id="article-content" class="hidden flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex-col lg:flex-row gap-8">
 
-        <nav class="text-sm text-gray-500 dark:text-gray-400 mb-6 flex items-center gap-2">
-            <a href="index.html" class="hover:text-primary"><i class="fa-solid fa-house"></i> الرئيسية</a>
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-            <a id="breadcrumb-category" href="#" class="hover:text-primary font-bold">التصنيف</a>
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-            <span id="breadcrumb-title" class="text-gray-800 dark:text-gray-200 font-semibold line-clamp-1">...</span>
-        </nav>
+        <!-- العمود الرئيسي للمقال (75%) -->
+        <div class="lg:w-3/4 w-full flex flex-col">
+            
+            <nav class="text-sm text-gray-500 dark:text-gray-400 mb-6 flex items-center gap-2">
+                <a href="index.html" class="hover:text-primary"><i class="fa-solid fa-house"></i> الرئيسية</a>
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+                <a id="breadcrumb-category" href="#" class="hover:text-primary font-bold">التصنيف</a>
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+                <span id="breadcrumb-title" class="text-gray-800 dark:text-gray-200 font-semibold line-clamp-1">...</span>
+            </nav>
 
-        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-6">
-            <span class="text-xs">إعلان - Advertisement</span>
-        </div>
-
-        <h1 id="article-title" class="text-2xl md:text-3xl font-bold mb-6 text-center dark:text-white leading-relaxed">...</h1>
-
-        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-24 flex flex-col justify-center items-center mb-8">
-            <span class="text-xs font-bold text-gray-500">إعلان راعي - Sponsored Ad</span>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-blue-50 dark:border-gray-700 p-6 mb-8 relative transition-colors">
-            <div class="absolute top-6 left-6 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-700 px-3 py-1 rounded-lg flex items-center gap-1 font-bold text-sm z-10">
-                <i class="fa-solid fa-star"></i> <span id="app-rating">0.0</span>
+            <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-6">
+                <span class="text-xs">إعلان علوي - Advertisement</span>
             </div>
 
-            <div class="flex flex-col gap-4 mb-6">
-                <img id="app-image" src="" alt="غلاف التطبيق" class="w-full aspect-video bg-blue-50 rounded-2xl object-cover shadow-md">
-                <div class="mt-2 text-center md:text-right">
-                    <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center md:justify-start gap-1 mb-1"><i class="fa-solid fa-box-open"></i> مراجعة وفحص</span>
-                    <h2 id="app-name" class="text-xl font-bold dark:text-white">...</h2>
+            <h1 id="article-title" class="text-2xl md:text-3xl font-extrabold mb-6 text-center dark:text-white leading-relaxed">...</h1>
+
+            <!-- بطاقة المقال -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-blue-50 dark:border-gray-700 p-6 mb-8 relative transition-colors">
+                <div class="absolute top-6 left-6 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-700 px-3 py-1 rounded-lg flex items-center gap-1 font-bold text-sm z-10">
+                    <i class="fa-solid fa-star"></i> <span id="app-rating">0.0</span>
+                </div>
+
+                <div class="flex flex-col gap-4 mb-6">
+                    <img id="app-image" src="" alt="غلاف التطبيق" class="w-full aspect-video bg-blue-50 rounded-2xl object-cover shadow-md">
+                    <div class="mt-2 text-center md:text-right">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center md:justify-start gap-1 mb-1"><i class="fa-solid fa-box-open"></i> مراجعة وفحص</span>
+                        <h2 id="app-name" class="text-xl font-bold dark:text-white">...</h2>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-gray-500 dark:text-gray-400 font-bold border-t border-gray-100 dark:border-gray-700 pt-6 transition-colors">
+                    <span id="article-category" class="bg-primary/10 text-primary px-3 py-1 rounded-full">القسم</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-400"></i> <span id="article-rating">0.0</span></span>
+                    <!-- تم إضافة أيقونة المشاهدات هنا -->
+                    <span class="flex items-center gap-1" title="عدد المشاهدات"><i class="fa-solid fa-eye text-blue-400"></i> <span id="article-views">0</span></span>
+                    <span id="article-downloads-badge" class="flex items-center gap-1"><i class="fa-solid fa-download text-green-500"></i> <span id="article-downloads">0</span> تحميل</span>
+                    <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> <span id="article-date">التاريخ</span></span>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-gray-500 dark:text-gray-400 font-bold border-t border-gray-100 dark:border-gray-700 pt-6 transition-colors">
-                <span id="article-category" class="bg-primary/10 text-primary px-3 py-1 rounded-full">القسم</span>
-                <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-400"></i> <span id="article-rating">0.0</span></span>
-                <span id="article-downloads-badge" class="flex items-center gap-1"><i class="fa-solid fa-download text-green-500"></i> <span id="article-downloads">0</span> تحميل</span>
-                <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> <span id="article-date">التاريخ</span></span>
-            </div>
-        </div>
-
-        <article id="article-body" class="prose dark:prose-invert max-w-none mb-8 text-gray-700 dark:text-gray-300 leading-relaxed text-center md:text-right">
-            <p>جاري تحميل شرح المقال...</p>
-        </article>
-
-        <!-- أزرار المشاركة -->
-        <div class="flex items-center gap-3 py-6 border-y border-gray-100 dark:border-gray-800 mb-8 justify-center md:justify-start transition-colors">
-            <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">شارك المقال:</span>
-            <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), '_blank')" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors shadow-sm"><i class="fa-brands fa-facebook-f"></i></button>
-            <button onclick="window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(window.location.href)+'&text='+encodeURIComponent(document.title), '_blank')" class="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center hover:bg-sky-600 transition-colors shadow-sm"><i class="fa-brands fa-twitter"></i></button>
-            <button onclick="window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title + ' ' + window.location.href), '_blank')" class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors shadow-sm"><i class="fa-brands fa-whatsapp"></i></button>
-            <button onclick="window.open('https://t.me/share/url?url='+encodeURIComponent(window.location.href)+'&text='+encodeURIComponent(document.title), '_blank')" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm"><i class="fa-brands fa-telegram"></i></button>
-        </div>
-
-        <!-- صندوق التحميل المتقدم (تم نقله إلى هنا مباشرة أسفل المقال) -->
-        <div id="download-section-wrapper" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="hidden md:flex flex-col justify-center items-center bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-3xl p-2 h-full min-h-[300px]">
-                <span class="text-xs writing-vertical">إعلان - Ad</span>
+            <!-- فهرس المحتويات التلقائي (TOC) -->
+            <div id="toc-container" class="hidden bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-5 mb-8">
+                <h3 class="text-lg font-bold mb-3 flex items-center gap-2 dark:text-white"><i class="fa-solid fa-list-ul text-primary"></i> محتويات المقال</h3>
+                <ul id="toc-list" class="flex flex-col gap-2 list-none p-0 m-0">
+                    <!-- سيتم حقن الروابط هنا تلقائياً -->
+                </ul>
             </div>
 
-            <div class="md:col-span-2 bg-white dark:bg-gray-800 rounded-3xl shadow-md border-t-4 border-blue-500 p-8 text-center transition-colors">
-                <div class="text-blue-500 text-4xl mb-4"><i class="fa-solid fa-cloud-arrow-down" id="box-icon"></i></div>
-                <h3 class="text-xl font-bold mb-4 dark:text-white">روابط التحميل المباشرة</h3>
-                <p class="text-gray-500 text-sm mb-6">اختر النسخة المناسبة لك للبدء بتجهيز الرابط</p>
+            <!-- محتوى المقال -->
+            <article id="article-body" class="prose dark:prose-invert max-w-none mb-8 text-gray-700 dark:text-gray-300 leading-relaxed text-right">
+                <p>جاري تحميل شرح المقال...</p>
+            </article>
+
+            <!-- أزرار المشاركة (مع زر نسخ الرابط) -->
+            <div class="flex items-center gap-3 py-6 border-y border-gray-100 dark:border-gray-800 mb-8 justify-center md:justify-start transition-colors flex-wrap">
+                <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">شارك المقال:</span>
+                <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), '_blank')" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors shadow-sm" title="مشاركة على فيسبوك"><i class="fa-brands fa-facebook-f"></i></button>
+                <button onclick="window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(window.location.href)+'&text='+encodeURIComponent(document.title), '_blank')" class="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center hover:bg-sky-600 transition-colors shadow-sm" title="مشاركة على تويتر"><i class="fa-brands fa-twitter"></i></button>
+                <button onclick="window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title + ' ' + window.location.href), '_blank')" class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors shadow-sm" title="مشاركة عبر واتساب"><i class="fa-brands fa-whatsapp"></i></button>
+                <button onclick="window.open('https://t.me/share/url?url='+encodeURIComponent(window.location.href)+'&text='+encodeURIComponent(document.title), '_blank')" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm" title="مشاركة عبر تيليجرام"><i class="fa-brands fa-telegram"></i></button>
+                <button onclick="copyArticleLink()" class="w-10 h-10 rounded-full bg-gray-600 dark:bg-gray-700 text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-sm border border-gray-500" title="نسخ الرابط"><i class="fa-solid fa-link"></i></button>
+            </div>
+
+            <!-- صندوق التحميل المتقدم -->
+            <div id="download-section-wrapper" class="w-full mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-md border-t-4 border-blue-500 p-8 text-center transition-colors">
+                    <div class="text-blue-500 text-4xl mb-4"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+                    <h3 class="text-xl font-bold mb-4 dark:text-white">روابط التحميل المباشرة</h3>
+                    <p class="text-gray-500 text-sm mb-6">اختر النسخة المناسبة لك للبدء بتجهيز الرابط</p>
+                    
+                    <div class="flex flex-col md:flex-row gap-3 justify-center" id="action-buttons-container">
+                        <!-- سيتم حقن أزرار التحميل هنا -->
+                    </div>
+
+                    <!-- زر الإبلاغ عن مشكلة -->
+                    <button onclick="openReportModal()" class="text-red-400 hover:text-red-600 dark:hover:text-red-300 text-xs font-bold flex items-center justify-center gap-1 mt-6 mx-auto transition-colors">
+                        <i class="fa-solid fa-triangle-exclamation"></i> هل توجد مشكلة في الروابط؟ أبلغنا من هنا
+                    </button>
+                </div>
+            </div>
+
+            <!-- إعلان سفلي -->
+            <div id="download-bottom-ad" class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-10">
+                <span class="text-xs">إعلان - Advertisement</span>
+            </div>
+
+            <!-- قسم التعليقات الجديد -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-10 transition-colors">
+                <h3 class="text-xl font-bold mb-6 border-r-4 border-primary pr-3 dark:text-white">التعليقات (<span id="comments-count">0</span>)</h3>
                 
-                <div class="flex flex-col gap-3 justify-center" id="action-buttons-container">
-                    <!-- سيتم حقن أزرار التحميل هنا بناءً على الروابط -->
-                    <div class="text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin"></i> جاري جلب الروابط...</div>
+                <!-- نموذج إضافة تعليق -->
+                <form id="comment-form" class="mb-8 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                    <div class="mb-3">
+                        <input type="text" id="comment-name" placeholder="الاسم (يظهر للعامة)" required class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary text-sm">
+                    </div>
+                    <div class="mb-3">
+                        <textarea id="comment-text" placeholder="اكتب تعليقك أو استفسارك هنا..." rows="3" required class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary text-sm"></textarea>
+                    </div>
+                    <button type="submit" id="submit-comment-btn" class="bg-primary hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> أضف التعليق
+                    </button>
+                </form>
+
+                <!-- قائمة التعليقات -->
+                <div id="comments-list" class="flex flex-col gap-4">
+                    <div class="text-center text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل التعليقات...</div>
                 </div>
+            </div>
 
-                <div class="mt-6">
-                    <a href="index.html" class="w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
-                        <i class="fa-solid fa-house"></i> العودة للرئيسية
-                    </a>
+        </div>
+
+        <!-- العمود الجانبي (25%) للتريند والمقالات ذات الصلة -->
+        <aside class="lg:w-1/4 w-full flex flex-col gap-6">
+            
+            <!-- مواضيع ذات صلة -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                <h3 class="font-bold text-lg mb-4 border-r-4 border-primary pr-2 dark:text-white">مواضيع ذات صلة</h3>
+                <div id="related-articles-container" class="flex flex-col gap-4">
+                    <div class="text-gray-400 text-sm text-center"><i class="fa-solid fa-spinner fa-spin"></i> جاري التحميل...</div>
                 </div>
             </div>
 
-            <div class="hidden md:flex flex-col justify-center items-center bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-3xl p-2 h-full min-h-[300px]">
-                <span class="text-xs writing-vertical">إعلان - Ad</span>
+            <!-- الأكثر تحميلاً (التريند) -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                <h3 class="font-bold text-lg mb-4 border-r-4 border-orange-500 pr-2 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-orange-500"></i> الأكثر تحميلاً
+                </h3>
+                <div id="trending-sidebar" class="flex flex-col gap-4">
+                    <div class="text-gray-400 text-sm text-center py-4"><i class="fa-solid fa-spinner fa-spin"></i> جاري التحميل...</div>
+                </div>
             </div>
-        </div>
 
-        <!-- إعلان سفلي (مربوط بصندوق التحميل) -->
-        <div id="download-bottom-ad" class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-10">
-            <span class="text-xs">إعلان - Advertisement</span>
-        </div>
-
-        <!-- قسم المقالات ذات الصلة (تم نقله إلى هنا أسفل التحميل) -->
-        <div class="mb-10">
-            <h3 class="text-xl font-bold border-r-4 border-primary pr-3 mb-6 dark:text-white">مواضيع ذات صلة</h3>
-            <div id="related-articles-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="text-gray-400 text-sm"><i class="fa-solid fa-spinner fa-spin"></i> جاري جلب المقالات...</div>
+            <!-- مساحة إعلانية -->
+            <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-xl p-2 text-center h-64 flex flex-col justify-center items-center shadow-inner">
+                <span class="text-[11px] font-bold mb-2">إعلان جانبي - Sidebar Ad</span>
+                <i class="fa-solid fa-rectangle-ad text-4xl opacity-50"></i>
             </div>
-        </div>
+            
+        </aside>
 
-        <!-- إعلان نهاية المقال -->
-        <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-20 flex flex-col justify-center items-center mb-8">
-            <span class="text-xs">إعلان - Advertisement</span>
-        </div>
-    </div>
+    </main>
 
     <!-- الفوتر -->
     <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto pt-8 pb-6 transition-colors">
@@ -175,7 +265,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, getDocs, updateDoc, increment, where, addDoc, serverTimestamp, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
@@ -191,15 +281,65 @@
         const db = getFirestore(app);
         const appId = 'abdoucrz_blog';
 
-        function getArticleIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
-        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleSlug = urlParams.get('slug');
+        const articleId = urlParams.get('id');
+        let globalRealArticleId = null;
+        let globalArticleTitle = null;
 
-        // دالة يتم استدعاؤها عند الضغط على زر التحميل لتمرير رقم الرابط
-        window.goToDownload = function(articleId, linkIdx) {
-            window.location.href = `download.html?id=${articleId}&linkIdx=${linkIdx}`;
+        // دوال التفاعل مع الواجهة
+        window.goToDownload = function(realArticleId, linkIdx) { window.location.href = `download.html?id=${realArticleId}&linkIdx=${linkIdx}`; };
+        
+        window.showMsg = function(msg, isError = false) {
+            const toast = document.getElementById('copy-toast');
+            document.getElementById('toast-msg').textContent = msg;
+            document.getElementById('toast-icon').className = isError ? 'fa-solid fa-circle-exclamation text-red-400' : 'fa-solid fa-check-circle text-green-400';
+            toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none'); }, 3000);
         };
+
+        window.copyArticleLink = function() {
+            navigator.clipboard.writeText(window.location.href).then(() => { window.showMsg("تم نسخ الرابط بنجاح!"); }).catch(err => { alert("تعذر نسخ الرابط."); });
+        };
+
+        // إدارة نافذة البلاغات
+        window.openReportModal = function() {
+            const modal = document.getElementById('report-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('div').classList.remove('scale-95'); }, 10);
+        };
+        window.closeReportModal = function() {
+            const modal = document.getElementById('report-modal');
+            modal.classList.add('opacity-0'); modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); document.getElementById('report-form').reset(); }, 300);
+        };
+
+        // دالة توليد الفهرس التلقائي (TOC)
+        function generateTableOfContents() {
+            const articleBody = document.getElementById('article-body');
+            const headings = articleBody.querySelectorAll('h2, h3');
+            const tocContainer = document.getElementById('toc-container');
+            const tocList = document.getElementById('toc-list');
+
+            if (headings.length > 0) {
+                tocContainer.classList.remove('hidden');
+                headings.forEach((heading, index) => {
+                    const id = 'heading-' + index;
+                    heading.id = id; // إعطاء معرف للعنصر
+                    
+                    const li = document.createElement('li');
+                    // المسافة البادئة تعتمد على نوع العنوان لترتيب شجري
+                    li.className = heading.tagName.toLowerCase() === 'h3' ? 'mr-4 text-sm' : 'text-base font-semibold';
+                    
+                    li.innerHTML = `
+                        <a href="#${id}" class="text-primary hover:text-blue-600 dark:hover:text-blue-400 hover:underline flex items-center gap-1 transition-colors">
+                            <i class="fa-solid fa-angle-left text-[10px]"></i> ${heading.textContent}
+                        </a>
+                    `;
+                    tocList.appendChild(li);
+                });
+            }
+        }
 
         signInAnonymously(auth).then(async () => {
             // جلب SEO 
@@ -208,29 +348,53 @@
                 if (seoSnap.exists()) {
                     const seoData = seoSnap.data();
                     if (seoData.adsenseId) {
-                        let adsenseScript = document.createElement('script');
-                        adsenseScript.async = true;
-                        adsenseScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${seoData.adsenseId}`;
-                        adsenseScript.crossOrigin = "anonymous";
-                        document.head.appendChild(adsenseScript);
+                        let adsenseScript = document.createElement('script'); adsenseScript.async = true; adsenseScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${seoData.adsenseId}`; adsenseScript.crossOrigin = "anonymous"; document.head.appendChild(adsenseScript);
                     }
                 }
             } catch (err) {}
 
-            const articleId = getArticleIdFromUrl();
-            if (!articleId) {
-                document.getElementById('page-loader').innerHTML = '<p class="text-red-500 font-bold">خطأ: لم يتم تحديد المقال بشكل صحيح.</p>';
-                return;
-            }
+            if (!articleSlug && !articleId) { document.getElementById('page-loader').innerHTML = '<p class="text-red-500 font-bold">خطأ: لم يتم تحديد المقال بشكل صحيح.</p>'; return; }
 
             try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId);
-                const docSnap = await getDoc(docRef);
+                let docSnap;
+                let docRefToUpdate; // مرجع المقال لتحديث المشاهدات
 
-                if (docSnap.exists()) {
+                if (articleSlug) {
+                    const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), where('slug', '==', articleSlug));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) { 
+                        docSnap = querySnapshot.docs[0]; 
+                        globalRealArticleId = docSnap.id; 
+                        docRefToUpdate = doc(db, 'artifacts', appId, 'public', 'data', 'articles', globalRealArticleId);
+                    }
+                } else if (articleId) {
+                    docRefToUpdate = doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId);
+                    docSnap = await getDoc(docRefToUpdate); 
+                    globalRealArticleId = docSnap.id;
+                }
+
+                if (docSnap && docSnap.exists()) {
                     const data = docSnap.data();
+                    globalArticleTitle = data.title;
                     
-                    document.title = `${data.title} - تحميل برابط مباشر abdoucrz`;
+                    // --- تحديث المشاهدات الحقيقية (View Counter) ---
+                    let currentViews = data.views || 0;
+                    document.getElementById('article-views').textContent = currentViews;
+                    
+                    // حماية: إذا لم يسبق للزائر مشاهدة هذا المقال، نزيد العداد
+                    if (!localStorage.getItem('viewed_article_' + globalRealArticleId)) {
+                        try {
+                            await updateDoc(docRefToUpdate, { views: increment(1) });
+                            localStorage.setItem('viewed_article_' + globalRealArticleId, 'true');
+                            document.getElementById('article-views').textContent = currentViews + 1;
+                        } catch (e) { console.error("Error updating views", e); }
+                    }
+
+                    // تحديث بطاقات المشاركة (Meta Tags) والدوم
+                    document.title = `${data.title} - تحميل برابط مباشر`;
+                    document.getElementById('og-title').content = data.title;
+                    document.getElementById('og-image').content = data.imageUrl || 'https://i.ibb.co/kgq5vmvH/crz.webp';
+                    
                     document.getElementById('breadcrumb-title').textContent = data.title;
                     document.getElementById('breadcrumb-category').textContent = data.category;
                     document.getElementById('breadcrumb-category').href = `index.html?category=${encodeURIComponent(data.category)}`;
@@ -242,94 +406,155 @@
                     document.getElementById('article-category').textContent = data.category;
                     document.getElementById('article-downloads').textContent = data.downloads || '0';
                     document.getElementById('article-date').textContent = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
-                    
                     if (data.imageUrl) { document.getElementById('app-image').src = data.imageUrl; }
                     
-                    // توليد محتوى المقال مع الإعلانات
+                    // توليد محتوى المقال (دعم HTML الخاص بـ Quill والنظام القديم)
                     const articleBody = document.getElementById('article-body');
                     if(data.content) {
-                        let paragraphs = data.content.split(/\n\n+/).filter(p => p.trim() !== '');
-                        let formattedContent = '';
-                        const inlineAdHtml = `<div class="my-8 w-full clear-both"><div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[100px] border border-dashed border-gray-300 dark:border-gray-600"><span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> إعلان مدمج (AdSense)</span></div></div>`;
-                        paragraphs.forEach((p, index) => {
-                            let cleanP = p.replace(/^###\s*(.*)$/gm, '<h3 class="text-xl md:text-2xl font-bold mt-10 mb-4 text-primary dark:text-primary">$1</h3>')
-                                          .replace(/^##\s*(.*)$/gm, '<h2 class="text-2xl md:text-3xl font-extrabold mt-12 mb-6 text-blue-600 dark:text-blue-400">$1</h2>')
-                                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 dark:text-white">$1</strong>');
-                            if (cleanP.trim().startsWith('<h')) { formattedContent += cleanP; } else { formattedContent += `<p class="mb-6 leading-relaxed text-base md:text-lg">${cleanP.replace(/\n/g, '<br>')}</p>`; }
-                            if ((index + 1) % 2 === 0 && index < paragraphs.length - 1) { formattedContent += inlineAdHtml; }
-                        });
-                        articleBody.innerHTML = formattedContent;
-                    } else { articleBody.innerHTML = '<p>المحتوى غير متوفر حالياً.</p>'; }
+                        let contentToRender = '';
+                        document.getElementById('og-desc').content = data.content.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...'; // تحديث الوصف
+                        
+                        if (/<[a-z][\s\S]*>/i.test(data.content)) {
+                            contentToRender = data.content; 
+                        } else {
+                            let paragraphs = data.content.split(/\n\n+/).filter(p => p.trim() !== '');
+                            paragraphs.forEach((p) => {
+                                let cleanP = p.replace(/^###\s*(.*)$/gm, '<h3 class="text-xl md:text-2xl font-bold mt-10 mb-4 text-primary">$1</h3>')
+                                              .replace(/^##\s*(.*)$/gm, '<h2 class="text-2xl md:text-3xl font-extrabold mt-12 mb-6 text-blue-600">$1</h2>')
+                                              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                                if (cleanP.trim().startsWith('<h')) contentToRender += cleanP; 
+                                else contentToRender += `<p class="mb-6 leading-relaxed">${cleanP.replace(/\n/g, '<br>')}</p>`;
+                            });
+                        }
+                        articleBody.innerHTML = contentToRender;
+                        
+                        // استدعاء دالة الفهرس التلقائي بعد رسم المقال
+                        generateTableOfContents();
+                    }
 
-                    // --- توليد أزرار التحميل المتعددة (النظام الذكي) ---
+                    // توليد أزرار التحميل
                     const actionBtnContainer = document.getElementById('action-buttons-container');
                     actionBtnContainer.innerHTML = '';
-                    
                     let links = data.downloadLinks || [];
-                    if (links.length === 0 && data.downloadUrl) {
-                        links = [{ name: 'تحميل مباشر', url: data.downloadUrl }];
-                    }
+                    if (links.length === 0 && data.downloadUrl) links = [{ name: 'تحميل مباشر', url: data.downloadUrl }];
                     
-                    // إذا وجد روابط، سيطبعها كالمعتاد. وإذا لم يجد، سيخفي صندوق التحميل بالكامل.
                     if (links.length > 0) {
                         links.forEach((link, index) => {
-                            actionBtnContainer.innerHTML += `
-                                <button onclick="goToDownload('${articleId}', ${index})" class="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all text-lg mb-2">
-                                    <span>${link.name}</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                                </button>
-                            `;
+                            actionBtnContainer.innerHTML += `<button onclick="goToDownload('${globalRealArticleId}', ${index})" class="flex-1 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"><i class="fa-solid fa-arrow-right-to-bracket"></i> <span>${link.name}</span></button>`;
                         });
                     } else {
-                        // إخفاء صندوق التحميل والإعلان السفلي له
-                        const downloadSection = document.getElementById('download-section-wrapper');
-                        if (downloadSection) downloadSection.style.display = 'none';
-                        
-                        const bottomAd = document.getElementById('download-bottom-ad');
-                        if (bottomAd) bottomAd.style.display = 'none';
-
-                        // إخفاء نص "عدد التحميلات" من أعلى المقال ليكون أكثر منطقية للأخبار
-                        const downloadsBadge = document.getElementById('article-downloads-badge');
-                        if (downloadsBadge) downloadsBadge.style.display = 'none';
+                        document.getElementById('download-section-wrapper').style.display = 'none';
+                        document.getElementById('download-bottom-ad').style.display = 'none';
+                        document.getElementById('article-downloads-badge').style.display = 'none';
                     }
 
-                    // جلب المقالات المشابهة
-                    const relatedContainer = document.getElementById('related-articles-container');
-                    relatedContainer.innerHTML = ''; let count = 0;
-                    try {
-                        const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
-                        const querySnapshot = await getDocs(q);
-                        querySnapshot.forEach((d) => {
-                            const rData = d.data();
-                            if (rData.category === data.category && d.id !== articleId && count < 2) {
-                                count++;
-                                relatedContainer.innerHTML += `<a href="article.html?id=${d.id}" class="group flex flex-col sm:flex-row items-center gap-3 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all"><img src="${rData.imageUrl}" class="w-full sm:w-24 h-24 sm:h-20 object-cover rounded-lg group-hover:scale-105 transition-transform"><div class="flex-1 text-center sm:text-right mt-2 sm:mt-0"><h4 class="font-bold text-gray-800 dark:text-gray-100 text-sm line-clamp-2 group-hover:text-primary transition-colors">${rData.title}</h4><span class="text-xs text-gray-400 mt-1 block"><i class="fa-solid fa-star text-yellow-400"></i> ${rData.rating || '4.5'}</span></div></a>`;
-                            }
-                        });
-                        if (count === 0) relatedContainer.innerHTML = '<p class="text-sm text-gray-500">لا يوجد.</p>';
-                    } catch (relatedErr) {}
+                    // جلب مقالات ذات صلة والتريند
+                    fetchSidebarsData(data.category, globalRealArticleId);
+                    // جلب التعليقات
+                    fetchComments(globalRealArticleId);
 
                     document.getElementById('page-loader').classList.add('hidden');
                     document.getElementById('article-content').classList.remove('hidden');
+                    document.getElementById('article-content').classList.add('flex');
 
-                } else {
-                    document.getElementById('page-loader').innerHTML = '<p class="text-red-500 font-bold">المقال غير موجود.</p>';
-                }
-            } catch (error) {
-                document.getElementById('page-loader').innerHTML = '<p class="text-red-500 font-bold">خطأ في الاتصال بقاعدة البيانات.</p>';
-            }
+                } else { document.getElementById('page-loader').innerHTML = '<p class="text-red-500 font-bold">المقال غير موجود.</p>'; }
+            } catch (error) { document.getElementById('page-loader').innerHTML = '<p class="text-red-500 font-bold">خطأ في الاتصال.</p>'; }
+        });
+
+        // --- جلب المقالات ذات الصلة والأكثر تحميلاً في الشريط الجانبي ---
+        async function fetchSidebarsData(category, currentId) {
+            const relatedContainer = document.getElementById('related-articles-container');
+            const trendingContainer = document.getElementById('trending-sidebar');
+            try {
+                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
+                const querySnapshot = await getDocs(q);
+                let allArts = [];
+                
+                querySnapshot.forEach((d) => { if(!d.data().isUnlisted) allArts.push({ id: d.id, ...d.data() }); });
+                
+                // ذات صلة
+                relatedContainer.innerHTML = ''; let rCount = 0;
+                allArts.forEach(a => {
+                    if (a.category === category && a.id !== currentId && rCount < 3) {
+                        rCount++; const link = a.slug ? `article.html?slug=${a.slug}` : `article.html?id=${a.id}`;
+                        relatedContainer.innerHTML += `<a href="${link}" class="group flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"><img src="${a.imageUrl}" class="w-16 h-12 object-cover rounded shadow-sm"><div class="flex-1"><h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm line-clamp-2 group-hover:text-primary transition-colors">${a.title}</h4><span class="text-xs text-yellow-500 block mt-1"><i class="fa-solid fa-star"></i> ${a.rating || '4.5'}</span></div></a>`;
+                    }
+                });
+                if(rCount === 0) relatedContainer.innerHTML = '<span class="text-xs text-gray-500">لا توجد مواضيع مشابهة.</span>';
+
+                // التريند (الأكثر تحميلاً)
+                trendingContainer.innerHTML = '';
+                const topArticles = [...allArts].sort((a, b) => (b.actualDownloads || 0) - (a.actualDownloads || 0)).slice(0, 5);
+                topArticles.forEach((a, index) => {
+                    const link = a.slug ? `article.html?slug=${a.slug}` : `article.html?id=${a.id}`;
+                    trendingContainer.innerHTML += `<a href="${link}" class="trending-item flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition-colors group border border-transparent hover:border-gray-100 dark:hover:border-gray-700"><div class="relative w-16 h-12 flex-shrink-0 overflow-hidden rounded shadow-sm"><img src="${a.imageUrl}" class="trending-img w-full h-full object-cover transition-transform duration-300"><span class="absolute top-0 right-0 bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-bl">${index + 1}</span></div><div class="flex-1"><h4 class="font-bold text-gray-800 dark:text-gray-200 text-sm line-clamp-2 group-hover:text-primary transition-colors leading-tight">${a.title}</h4><span class="text-[11px] text-gray-500 block mt-1"><i class="fa-solid fa-download text-green-500"></i> ${a.actualDownloads || 0}</span></div></a>`;
+                });
+
+            } catch (e) { relatedContainer.innerHTML = ''; trendingContainer.innerHTML = ''; }
+        }
+
+        // --- نظام التعليقات ---
+        function fetchComments(artId) {
+            const commentsQ = query(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), where('articleId', '==', artId));
+            onSnapshot(commentsQ, (snapshot) => {
+                const list = document.getElementById('comments-list');
+                const countSpan = document.getElementById('comments-count');
+                list.innerHTML = ''; let count = 0; let arr = [];
+                snapshot.forEach(d => arr.push({id: d.id, ...d.data()}));
+                arr.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                
+                arr.forEach(c => {
+                    count++;
+                    const dStr = c.createdAt ? new Date(c.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
+                    list.innerHTML += `<div class="bg-gray-50 dark:bg-gray-700/20 p-4 rounded-xl border border-gray-100 dark:border-gray-700"><div class="flex items-center gap-2 mb-2"><div class="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-user"></i></div><div><h5 class="font-bold text-sm dark:text-white">${c.userName}</h5><span class="text-[10px] text-gray-400">${dStr}</span></div></div><p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-line">${c.commentText}</p></div>`;
+                });
+                countSpan.textContent = count;
+                if(count === 0) list.innerHTML = '<p class="text-center text-sm text-gray-500">كن أول من يعلق على هذا التطبيق!</p>';
+            });
+        }
+
+        document.getElementById('comment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!globalRealArticleId) return;
+            const btn = document.getElementById('submit-comment-btn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = 'جاري الإرسال...';
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), {
+                    articleId: globalRealArticleId,
+                    articleTitle: globalArticleTitle,
+                    articleSlug: articleSlug || '',
+                    userName: document.getElementById('comment-name').value.trim(),
+                    commentText: document.getElementById('comment-text').value.trim(),
+                    createdAt: serverTimestamp()
+                });
+                e.target.reset(); window.showMsg("تم إضافة تعليقك بنجاح!");
+            } catch(e) { window.showMsg("حدث خطأ", true); } finally { btn.disabled = false; btn.innerHTML = orig; }
+        });
+
+        // --- نظام البلاغات ---
+        document.getElementById('report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!globalRealArticleId) return;
+            const reason = document.querySelector('input[name="reportReason"]:checked').value;
+            const btn = document.getElementById('submit-report-btn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = 'جاري الإرسال...';
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'reports'), {
+                    articleId: globalRealArticleId,
+                    articleTitle: globalArticleTitle,
+                    articleSlug: articleSlug || '',
+                    reason: reason,
+                    createdAt: serverTimestamp()
+                });
+                window.closeReportModal(); window.showMsg("تم إرسال البلاغ للإدارة، شكراً لك!");
+            } catch(e) { window.showMsg("حدث خطأ", true); } finally { btn.disabled = false; btn.innerHTML = orig; }
         });
 
         // الوضع الليلي
         var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         var themeToggleBtn = document.getElementById('theme-toggle');
-
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             themeToggleLightIcon.classList.remove('hidden'); document.documentElement.classList.add('dark');
-        } else {
-            themeToggleDarkIcon.classList.remove('hidden'); document.documentElement.classList.remove('dark');
-        }
-
+        } else { themeToggleDarkIcon.classList.remove('hidden'); document.documentElement.classList.remove('dark'); }
         themeToggleBtn.addEventListener('click', function() {
             themeToggleDarkIcon.classList.toggle('hidden'); themeToggleLightIcon.classList.toggle('hidden');
             if (localStorage.getItem('color-theme') === 'light') { document.documentElement.classList.add('dark'); localStorage.setItem('color-theme', 'dark'); } 

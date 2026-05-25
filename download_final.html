@@ -27,6 +27,18 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col">
 
+    <!-- نافذة مانع الإعلانات (AdBlock Detector Overlay) -->
+    <div id="adblock-warning" class="fixed inset-0 bg-black/90 z-50 items-center justify-center hidden backdrop-blur-md">
+        <div class="bg-white dark:bg-[#1e293b] p-8 rounded-3xl max-w-md w-full text-center border-t-4 border-red-500 shadow-2xl mx-4 transform transition-all">
+            <i class="fa-solid fa-hand-shield text-6xl text-red-500 mb-6 animate-pulse"></i>
+            <h2 class="text-2xl font-extrabold text-gray-800 dark:text-white mb-4">مانع الإعلانات مُفعل!</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-8 font-semibold leading-relaxed">عذراً صديقي، نحن نعتمد على الإعلانات لنستمر في تقديم هذه الروابط المجانية لك. يرجى إيقاف إضافة <b>AdBlock</b> مؤقتاً لتتمكن من إكمال التحميل.</p>
+            <button onclick="window.location.reload()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-lg w-full flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> لقد قمت بإيقافه، تحديث الصفحة
+            </button>
+        </div>
+    </div>
+
     <!-- الهيدر -->
     <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,7 +63,7 @@
 
     <main class="flex-1 max-w-5xl mx-auto px-4 py-8 w-full">
         
-        <!-- 1. إعلان علوي عريض (أساسي) -->
+        <!-- 1. إعلان علوي عريض -->
         <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-24 flex flex-col justify-center items-center mb-8 shadow-inner">
             <span class="text-[11px] font-bold mb-1">إعلان - Advertisement</span>
             <i class="fa-solid fa-rectangle-ad text-2xl opacity-50"></i>
@@ -59,7 +71,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <!-- العمود الجانبي (مواضيع مقترحة وإعلانات) -->
+            <!-- العمود الجانبي -->
             <div class="lg:col-span-1 flex flex-col gap-6">
                 
                 <!-- 2. إعلان جانبي علوي -->
@@ -75,17 +87,17 @@
                     </div>
                 </div>
 
-                <!-- 3. إعلان جانبي سفلي (إضافة جديدة) -->
+                <!-- 3. إعلان جانبي سفلي -->
                 <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-xl p-2 text-center h-64 flex flex-col justify-center items-center shadow-inner">
                     <span class="text-[11px] font-bold mb-2">إعلان مدعوم - Sponsored</span>
                     <i class="fa-solid fa-rectangle-ad text-4xl opacity-50"></i>
                 </div>
             </div>
 
-            <!-- العمود الرئيسي (صندوق التحميل) -->
+            <!-- العمود الرئيسي -->
             <div class="lg:col-span-2 flex flex-col gap-6">
                 
-                <!-- 4. إعلان فوق صندوق التحميل (إضافة جديدة) -->
+                <!-- 4. إعلان فوق صندوق التحميل -->
                 <div class="w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center min-h-[90px] flex flex-col justify-center items-center shadow-inner">
                     <span class="text-[11px] font-bold mb-1">إعلان - Ad</span>
                 </div>
@@ -112,13 +124,12 @@
                         <div id="progress-bar" class="bg-green-500 h-4 rounded-full" style="width: 0%"></div>
                     </div>
 
-                    <!-- 5. إعلان داخل الصندوق (عالي النقر - إضافة جديدة قوية) -->
+                    <!-- 5. إعلان داخل الصندوق -->
                     <div class="w-full bg-gray-100 dark:bg-gray-700/30 border border-gray-200 dark:border-gray-600 text-gray-400 rounded-xl p-2 text-center min-h-[100px] flex flex-col justify-center items-center mb-6 shadow-inner">
                         <span class="text-[10px] font-bold mb-1 opacity-70">إعلان - Advertisement</span>
                         <i class="fa-solid fa-rectangle-ad text-3xl opacity-30"></i>
                     </div>
 
-                    <!-- الزر النهائي مخفي في البداية -->
                     <button id="download-btn" class="hidden w-full py-4 bg-primary hover:bg-blue-600 text-white font-extrabold rounded-xl items-center justify-center gap-3 shadow-xl hover:shadow-2xl transition-all text-xl transform hover:-translate-y-1 animate-[pulse_2s_ease-in-out_infinite]">
                         <i class="fa-solid fa-download"></i> حمّـــل الآن
                     </button>
@@ -132,7 +143,7 @@
 
         </div>
 
-        <!-- 7. إعلان عريض سفلي جداً قبل الفوتر (إضافة جديدة) -->
+        <!-- 7. إعلان عريض سفلي -->
         <div class="mt-8 w-full bg-gray-200 dark:bg-gray-800 border border-dashed border-gray-400 dark:border-gray-600 text-gray-400 rounded-lg p-2 text-center h-24 flex flex-col justify-center items-center shadow-inner">
             <span class="text-[11px] font-bold mb-1">إعلان سفلي - Bottom Ad</span>
             <i class="fa-solid fa-rectangle-ad text-2xl opacity-50"></i>
@@ -169,12 +180,31 @@
         const db = getFirestore(app);
         const appId = 'abdoucrz_blog';
 
-        // استخراج معرف المقال ورقم الرابط من الـ URL
         const urlParams = new URLSearchParams(window.location.search);
         const articleId = urlParams.get('id');
         const linkIdx = parseInt(urlParams.get('linkIdx') || '0', 10);
         
         let finalDirectUrl = "#";
+
+        // --- نظام كشف مانع الإعلانات (Anti-Adblock) المتقدم ---
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                let adTest = document.createElement('div');
+                adTest.innerHTML = '&nbsp;';
+                adTest.className = 'adsbox ad-placement doubleclick-ad';
+                adTest.style.position = 'absolute';
+                adTest.style.left = '-9999px';
+                document.body.appendChild(adTest);
+                
+                if (adTest.offsetHeight === 0 || window.getComputedStyle(adTest).display === 'none') {
+                    const overlay = document.getElementById('adblock-warning');
+                    overlay.classList.remove('hidden');
+                    overlay.classList.add('flex');
+                    document.body.style.overflow = 'hidden'; 
+                }
+                adTest.remove();
+            }, 1000); 
+        });
 
         signInAnonymously(auth).then(async () => {
             try {
@@ -196,13 +226,11 @@
                 return;
             }
 
-            // جلب بيانات المقال واستخراج الرابط الدقيق الذي اختاره الزائر
             try {
                 const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleId));
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    // تحديد الرابط الصحيح من المصفوفة
                     let links = data.downloadLinks || [];
                     if (links.length === 0 && data.downloadUrl) {
                         links = [{ name: 'تحميل مباشر', url: data.downloadUrl }];
@@ -210,7 +238,6 @@
 
                     if (links[linkIdx]) {
                         finalDirectUrl = links[linkIdx].url;
-                        // إضافة اسم الرابط المختار بجانب اسم التطبيق لتأكيد نجاح العملية للزائر
                         document.getElementById('app-title').textContent = data.title + ' (' + links[linkIdx].name + ')';
                     } else {
                         document.getElementById('app-title').textContent = "حدث خطأ: الرابط غير موجود";
@@ -221,7 +248,6 @@
                         document.getElementById('app-image').classList.remove('hidden');
                     }
 
-                    // جلب المقالات المقترحة
                     fetchRelatedArticles(data.category);
                 }
             } catch (e) { console.error(e); }
@@ -246,21 +272,18 @@
                     document.getElementById('progress-container').classList.add('hidden');
                     document.getElementById('loader-icon').innerHTML = '<i class="fa-solid fa-check-circle text-green-500"></i>';
                     
-                    // إظهار زر التحميل النهائي
                     downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> حمّـــل الآن';
                     downloadBtn.classList.remove('hidden');
                     downloadBtn.classList.add('flex');
                 }
             }, 1000);
 
-            // حدث الضغط على زر التحميل المباشر
             downloadBtn.addEventListener('click', () => {
                 if(finalDirectUrl !== "#") {
                     window.open(finalDirectUrl, '_blank');
                 }
             });
             
-            // دالة جلب المقالات المقترحة
             async function fetchRelatedArticles(category) {
                 const relatedContainer = document.getElementById('related-articles-container');
                 try {

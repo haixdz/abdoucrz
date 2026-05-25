@@ -17,6 +17,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -35,49 +36,53 @@
         .card-hover:hover {
             transform: translateY(-5px);
         }
+        /* تأثيرات بسيطة للقسم الجانبي */
+        .trending-item:hover .trending-img { transform: scale(1.1); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+<body class="bg-gray-50 text-gray-800 font-sans antialiased transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
 
     <!-- شريط التنقل العلوي (Header) -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16 md:h-20"> <!-- تم تكبير ارتفاع الهيدر قليلا ليناسب الشعار -->
+            <div class="flex justify-between items-center h-16 md:h-20"> 
                 <!-- الشعار (Logo) -->
                 <div class="flex-shrink-0 flex items-center">
                     <a href="index.html" class="flex items-center hover:opacity-80 transition-opacity">
-                        <!-- تم تكبير الشعار هنا (h-12 بدلا من h-8) -->
-                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-12 md:h-14 object-contain">
+                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-12 md:h-14 object-contain dark:brightness-0 dark:invert">
                     </a>
                 </div>
 
                 <!-- القائمة الرئيسية (لأجهزة الكمبيوتر) -->
                 <nav class="hidden md:flex space-x-8 space-x-reverse items-center">
-                    <a href="index.html" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-house"></i> الرئيسية</a>
-                    <a href="index.html?category=تطبيقات" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> تطبيقات</a>
-                    <a href="index.html?category=ألعاب" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-gamepad"></i> ألعاب</a>
-                    <a href="index.html?category=مواقع" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-globe"></i> مواقع</a>
-                    <a href="index.html?category=أخبار تقنية" class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-newspaper"></i> أخبار تقنية</a>
+                    <a href="index.html" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-house"></i> الرئيسية</a>
+                    <a href="index.html?category=تطبيقات" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> تطبيقات</a>
+                    <a href="index.html?category=ألعاب" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-gamepad"></i> ألعاب</a>
+                    <a href="index.html?category=مواقع" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-globe"></i> مواقع</a>
+                    <a href="index.html?category=أخبار تقنية" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-1"><i class="fa-solid fa-newspaper"></i> أخبار تقنية</a>
                 </nav>
 
-                <!-- قسم البحث وزر الانضمام -->
+                <!-- قسم البحث وزر الوضع الليلي -->
                 <div class="hidden md:flex items-center gap-4">
-                    <!-- زر الوضع الليلي -->
                     <button id="theme-toggle" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-lg p-2 transition-colors">
                         <i id="theme-toggle-dark-icon" class="fa-solid fa-moon hidden"></i>
                         <i id="theme-toggle-light-icon" class="fa-solid fa-sun hidden"></i>
                     </button>
 
                     <div class="relative">
-                        <input type="text" placeholder="ابحث عن لعبة أو تطبيق..." class="bg-gray-100 text-sm rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary w-64">
+                        <!-- تفعيل البحث الفوري -->
+                        <input type="text" id="search-input" placeholder="ابحث عن لعبة أو تطبيق..." class="bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 border text-sm rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary w-64 transition-colors">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
                     </div>
-                    <!-- تم حذف زر الانضمام للمبدعين نهائياً من هنا -->
                 </div>
 
-                <!-- زر القائمة للهواتف (تم إضافة الـ ID هنا ليعمل الزر) -->
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-primary focus:outline-none text-2xl transition-colors">
+                <!-- زر القائمة للهواتف -->
+                <div class="md:hidden flex items-center gap-3">
+                    <button id="theme-toggle-mobile" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-lg p-2 transition-colors">
+                        <i id="theme-toggle-dark-icon-mobile" class="fa-solid fa-moon hidden"></i>
+                        <i id="theme-toggle-light-icon-mobile" class="fa-solid fa-sun hidden"></i>
+                    </button>
+                    <button id="mobile-menu-btn" class="text-gray-600 dark:text-gray-300 hover:text-primary focus:outline-none text-2xl transition-colors">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                 </div>
@@ -85,23 +90,27 @@
         </div>
     </header>
 
-    <!-- القائمة الجانبية للهواتف (Mobile Sidebar) -->
+    <!-- القائمة الجانبية للهواتف -->
     <div id="mobile-sidebar" class="fixed inset-0 z-50 hidden">
-        <!-- خلفية مظلمة (Overlay) -->
         <div id="mobile-sidebar-overlay" class="absolute inset-0 bg-black bg-opacity-50 transition-opacity opacity-0"></div>
-        
-        <!-- القائمة نفسها -->
         <nav id="mobile-sidebar-content" class="absolute top-0 right-0 bottom-0 w-64 bg-white dark:bg-gray-800 shadow-xl transform translate-x-full transition-transform duration-300 flex flex-col">
             <div class="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-700">
                 <a href="index.html" class="flex items-center">
-                    <!-- تم تكبير الشعار في قائمة الهاتف -->
-                    <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-10 object-contain">
+                    <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-10 object-contain dark:brightness-0 dark:invert">
                 </a>
-                <button id="close-mobile-menu" class="text-gray-500 hover:text-red-500 text-2xl focus:outline-none transition-colors">
+                <button id="close-mobile-menu" class="text-gray-500 dark:text-gray-400 hover:text-red-500 text-2xl focus:outline-none transition-colors">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-2 px-4">
+            
+            <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+                <div class="relative w-full">
+                    <input type="text" id="search-input-mobile" placeholder="بحث..." class="w-full bg-gray-100 dark:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 text-sm rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary transition-colors">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto py-4 flex flex-col gap-2 px-4">
                 <a href="index.html" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-house text-primary"></i> الرئيسية</a>
                 <a href="index.html?category=تطبيقات" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-mobile-screen text-primary"></i> تطبيقات</a>
                 <a href="index.html?category=ألعاب" class="p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold flex items-center gap-3 transition-colors"><i class="fa-solid fa-gamepad text-primary"></i> ألعاب</a>
@@ -111,58 +120,78 @@
         </nav>
     </div>
 
-    <!-- مساحة إعلانية علوية مجهزة لـ Google AdSense -->
+    <!-- مساحة إعلانية علوية -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 flex justify-center items-center text-gray-400 dark:text-gray-500 text-sm min-h-[100px] border border-gray-200 dark:border-gray-700 transition-colors">
+        <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 flex justify-center items-center text-gray-400 dark:text-gray-500 text-sm min-h-[100px] border border-gray-200 dark:border-gray-700 transition-colors shadow-inner">
             <span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> مساحة إعلانية علوية (AdSense)</span>
         </div>
     </div>
 
-    <!-- المحتوى الرئيسي -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <!-- المحتوى الرئيسي (مقسم لعمودين) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col lg:flex-row gap-8">
         
-        <!-- مساحة إعلانية إضافية وسطية (جديدة لزيادة الأرباح) -->
-        <div class="mb-10 w-full hidden md:block">
-            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[120px] border border-dashed border-gray-300 dark:border-gray-700">
-                <span class="font-bold flex items-center gap-2"><i class="fa-solid fa-rectangle-ad"></i> مساحة إعلانية وسطية (AdSense)</span>
-            </div>
-        </div>
-
-        <!-- حاوية المقالات -->
-        <div id="articles-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <!-- العمود الأيسر (أو الرئيسي) للمقالات (75%) -->
+        <div class="lg:w-3/4 w-full flex flex-col">
             
-            <!-- رسالة تحميل تظهر حتى يتم جلب البيانات -->
-            <div class="col-span-full text-center py-12">
-                <i class="fa-solid fa-spinner fa-spin text-4xl text-primary mb-4"></i>
-                <p class="text-gray-500 font-semibold">جاري جلب المقالات من قاعدة البيانات...</p>
+            <div id="category-filters-container"></div> <!-- يتم حقن الفلتر هنا -->
+
+            <!-- حاوية المقالات -->
+            <div id="articles-container" class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+                <div class="col-span-full text-center py-12">
+                    <i class="fa-solid fa-spinner fa-spin text-4xl text-primary mb-4"></i>
+                    <p class="text-gray-500 font-semibold dark:text-gray-400">جاري جلب المقالات...</p>
+                </div>
             </div>
 
+            <!-- زر تحميل المزيد -->
+            <div id="load-more-container" class="w-full flex justify-center mt-12 hidden">
+                <button id="load-more-btn" class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg hover:text-primary hover:border-primary font-bold py-3 px-8 rounded-full transition-all duration-300 flex items-center gap-2">
+                    عرض المزيد <i class="fa-solid fa-angle-down"></i>
+                </button>
+            </div>
         </div>
+
+        <!-- العمود الأيمن الجانبي (25%) -->
+        <aside class="lg:w-1/4 w-full flex flex-col gap-6">
+            
+            <!-- قائمة الأكثر تحميلاً (التريند) -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                <h3 class="font-bold text-lg mb-4 border-r-4 border-primary pr-2 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-orange-500"></i> الأكثر تحميلاً
+                </h3>
+                <div id="trending-sidebar" class="flex flex-col gap-4">
+                    <div class="text-gray-400 text-sm text-center py-4"><i class="fa-solid fa-spinner fa-spin"></i> جاري التحميل...</div>
+                </div>
+            </div>
+
+            <!-- مساحة إعلانية جانبية -->
+            <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4 flex justify-center items-center text-gray-400 text-sm min-h-[300px] border border-dashed border-gray-300 dark:border-gray-700 shadow-inner">
+                <div class="text-center">
+                    <span class="text-[11px] font-bold mb-1 block">إعلان جانبي - Sidebar Ad</span>
+                    <i class="fa-solid fa-rectangle-ad text-3xl opacity-50"></i>
+                </div>
+            </div>
+
+        </aside>
+
     </main>
 
-    <!-- الفوتر (Footer) - مهم جداً للقبول في أدسنس -->
+    <!-- الفوتر (Footer) -->
     <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 pt-8 pb-6 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                
-                <!-- حقوق النشر والشعار -->
                 <div class="flex flex-col items-center md:items-start">
                     <a href="index.html" class="mb-4 hover:opacity-80 transition-opacity">
-                        <!-- تم تكبير الشعار في الفوتر بقوة -->
-                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-14 md:h-16 object-contain">
+                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-14 md:h-16 object-contain dark:brightness-0 dark:invert">
                     </a>
                     <p class="text-sm text-gray-500 dark:text-gray-400">© 2026 جميع الحقوق محفوظة لمدونة abdoucrz.</p>
                 </div>
-
-                <!-- الصفحات الإلزامية (AdSense) -->
                 <div class="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400 font-semibold">
                     <a href="page.html?type=privacy" class="hover:text-primary dark:hover:text-primary transition-colors">سياسة الخصوصية</a>
                     <a href="page.html?type=terms" class="hover:text-primary dark:hover:text-primary transition-colors">شروط الاستخدام</a>
                     <a href="page.html?type=contact" class="hover:text-primary dark:hover:text-primary transition-colors">اتصل بنا</a>
                     <a href="page.html?type=about" class="hover:text-primary dark:hover:text-primary transition-colors">من نحن</a>
                 </div>
-
-                <!-- منصات التواصل -->
                 <div class="flex gap-4">
                     <a id="social-fb" href="#" class="text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary text-xl transition-colors"><i class="fa-brands fa-facebook"></i></a>
                     <a id="social-tw" href="#" class="text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary text-xl transition-colors"><i class="fa-brands fa-twitter"></i></a>
@@ -173,7 +202,7 @@
         </div>
     </footer>
 
-    <!-- نافذة الموافقة على ملفات تعريف الارتباط (الكوكيز) لـ AdSense -->
+    <!-- نافذة الكوكيز -->
     <div id="cookie-banner" class="fixed bottom-0 inset-x-0 pb-2 sm:pb-5 z-50 hidden transition-transform transform translate-y-full duration-500">
         <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div class="p-3 rounded-lg bg-gray-900 shadow-2xl sm:p-4 border border-gray-700">
@@ -216,117 +245,57 @@
         const db = getFirestore(app);
         const appId = 'abdoucrz_blog';
 
+        // المتغيرات العالمية للبحث وتحميل المزيد
+        let allArticlesData = [];
+        let currentLimit = 10; 
+        let currentSearchTerm = '';
+        const articlesContainer = document.getElementById('articles-container');
+        const loadMoreContainer = document.getElementById('load-more-container');
+        const loadMoreBtn = document.getElementById('load-more-btn');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedCategory = urlParams.get('category');
+
         signInAnonymously(auth).then(() => {
             
-            // --- نظام الإحصائيات المخصص (Tracker الذكي الجديد للرسم البياني) ---
+            // --- تتبع الزوار ---
             async function trackVisit() {
-                // استخراج تاريخ اليوم بصيغة YYYY-MM-DD
                 const today = new Date().toISOString().split('T')[0]; 
-                
                 const globalRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'global_stats');
                 const dailyRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', today);
                 
-                let globalUpdates = { views: increment(1) };
-                let dailyUpdates = { views: increment(1) };
+                let globalUpdates = { views: increment(1) }; let dailyUpdates = { views: increment(1) };
                 
-                // التحقق مما إذا كان الزائر جديداً إجمالاً (للإحصائيات العامة)
-                if (!localStorage.getItem('tracked_unique_visitor')) {
-                    globalUpdates.uniqueVisitors = increment(1);
-                    localStorage.setItem('tracked_unique_visitor', 'true');
-                }
-                
-                // التحقق مما إذا كان الزائر جديداً لهذا اليوم تحديداً (للمنحنى البياني)
+                if (!localStorage.getItem('tracked_unique_visitor')) { globalUpdates.uniqueVisitors = increment(1); localStorage.setItem('tracked_unique_visitor', 'true'); }
                 const todayUniqueKey = 'tracked_unique_' + today;
-                if (!localStorage.getItem(todayUniqueKey)) {
-                    dailyUpdates.uniqueVisitors = increment(1);
-                    localStorage.setItem(todayUniqueKey, 'true');
-                }
+                if (!localStorage.getItem(todayUniqueKey)) { dailyUpdates.uniqueVisitors = increment(1); localStorage.setItem(todayUniqueKey, 'true'); }
                 
                 try {
-                    // إرسال المشاهدة للإحصائيات العامة واليومية في نفس الوقت
-                    await setDoc(globalRef, globalUpdates, { merge: true });
-                    await setDoc(dailyRef, dailyUpdates, { merge: true });
-                    
-                    // تتبع مدة البقاء
-                    setInterval(async () => {
-                        if (document.visibilityState === 'visible') {
-                            await setDoc(globalRef, { timeSpent: increment(15) }, { merge: true });
-                            await setDoc(dailyRef, { timeSpent: increment(15) }, { merge: true });
-                        }
-                    }, 15000);
+                    await setDoc(globalRef, globalUpdates, { merge: true }); await setDoc(dailyRef, dailyUpdates, { merge: true });
+                    setInterval(async () => { if (document.visibilityState === 'visible') { await setDoc(globalRef, { timeSpent: increment(15) }, { merge: true }); await setDoc(dailyRef, { timeSpent: increment(15) }, { merge: true }); } }, 15000);
                 } catch(e) { console.error('Analytics Error:', e); }
             }
-            trackVisit(); // تشغيل متتبع الزيارات
+            trackVisit();
 
-            // --- جلب إعدادات SEO وأدسنس ديناميكياً وحقنها في رأس الصفحة ---
+            // --- جلب إعدادات SEO ---
             const seoDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo');
             getDoc(seoDocRef).then((seoSnap) => {
                 if (seoSnap.exists()) {
                     const seoData = seoSnap.data();
-                    // إضافة وصف الموقع
-                    if (seoData.description) {
-                        let metaDesc = document.createElement('meta');
-                        metaDesc.name = "description";
-                        metaDesc.content = seoData.description;
-                        document.head.appendChild(metaDesc);
-                    }
-                    // إضافة الكلمات المفتاحية
-                    if (seoData.keywords) {
-                        let metaKeywords = document.createElement('meta');
-                        metaKeywords.name = "keywords";
-                        metaKeywords.content = seoData.keywords;
-                        document.head.appendChild(metaKeywords);
-                    }
-
-                    // إضافة كود إثبات الملكية (Google Site Verification)
-                    if (seoData.siteVerification) {
-                        let metaVerification = document.createElement('meta');
-                        metaVerification.name = "google-site-verification";
-                        metaVerification.content = seoData.siteVerification.trim();
-                        document.head.appendChild(metaVerification);
-                    }
-
-                    // دمج كود جوجل أدسنس تلقائياً
-                    if (seoData.adsenseId) {
-                        let adsenseScript = document.createElement('script');
-                        adsenseScript.async = true;
-                        adsenseScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${seoData.adsenseId}`;
-                        adsenseScript.crossOrigin = "anonymous";
-                        document.head.appendChild(adsenseScript);
-                    }
-
-                    // دمج كود Google Analytics تلقائياً لتتبع الزوار (تمت إضافة المعرف الخاص بك افتراضياً هنا)
+                    if (seoData.description) { let metaDesc = document.createElement('meta'); metaDesc.name = "description"; metaDesc.content = seoData.description; document.head.appendChild(metaDesc); }
+                    if (seoData.keywords) { let metaKeywords = document.createElement('meta'); metaKeywords.name = "keywords"; metaKeywords.content = seoData.keywords; document.head.appendChild(metaKeywords); }
+                    if (seoData.siteVerification) { let metaVerification = document.createElement('meta'); metaVerification.name = "google-site-verification"; metaVerification.content = seoData.siteVerification.trim(); document.head.appendChild(metaVerification); }
+                    if (seoData.adsenseId) { let adsenseScript = document.createElement('script'); adsenseScript.async = true; adsenseScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${seoData.adsenseId}`; adsenseScript.crossOrigin = "anonymous"; document.head.appendChild(adsenseScript); }
                     const finalAnalyticsId = seoData.analyticsId || "G-8WF00TW430";
                     if (finalAnalyticsId) {
-                        let gaScript = document.createElement('script');
-                        gaScript.async = true;
-                        gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${finalAnalyticsId}`;
-                        document.head.appendChild(gaScript);
-
-                        let gaInlineScript = document.createElement('script');
-                        gaInlineScript.innerHTML = `
-                            window.dataLayer = window.dataLayer || [];
-                            function gtag(){dataLayer.push(arguments);}
-                            gtag('js', new Date());
-                            gtag('config', '${finalAnalyticsId}');
-                        `;
-                        document.head.appendChild(gaInlineScript);
+                        let gaScript = document.createElement('script'); gaScript.async = true; gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${finalAnalyticsId}`; document.head.appendChild(gaScript);
+                        let gaInlineScript = document.createElement('script'); gaInlineScript.innerHTML = `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '${finalAnalyticsId}');`; document.head.appendChild(gaInlineScript);
                     }
-
-                    // تحديث روابط التواصل الاجتماعي في الفوتر
-                    if (seoData.facebookUrl) document.getElementById('social-fb').href = seoData.facebookUrl;
-                    if (seoData.twitterUrl) document.getElementById('social-tw').href = seoData.twitterUrl;
-                    if (seoData.instagramUrl) document.getElementById('social-ig').href = seoData.instagramUrl;
-                    if (seoData.telegramUrl) document.getElementById('social-tg').href = seoData.telegramUrl;
+                    if (seoData.facebookUrl) document.getElementById('social-fb').href = seoData.facebookUrl; if (seoData.twitterUrl) document.getElementById('social-tw').href = seoData.twitterUrl; if (seoData.instagramUrl) document.getElementById('social-ig').href = seoData.instagramUrl; if (seoData.telegramUrl) document.getElementById('social-tg').href = seoData.telegramUrl;
                 }
             }).catch(err => console.error("Error loading SEO:", err));
 
-            const articlesContainer = document.getElementById('articles-container');
-            
-            // --- إضافة أزرار التصنيفات (الفلتر) وقراءة الرابط ---
-            const urlParams = new URLSearchParams(window.location.search);
-            const selectedCategory = urlParams.get('category');
-            
+            // --- الفلتر (التصنيفات) ---
             const filterHTML = `
                 <div class="flex flex-wrap gap-2 mb-8 justify-center" id="category-filters">
                     <a href="index.html" class="px-5 py-2 rounded-full ${!selectedCategory ? 'bg-primary text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm'} border border-gray-200 dark:border-gray-700 hover:bg-primary hover:text-white font-bold text-sm transition-all duration-300">الكل</a>
@@ -336,63 +305,84 @@
                     <a href="index.html?category=أخبار تقنية" class="px-5 py-2 rounded-full ${selectedCategory === 'أخبار تقنية' ? 'bg-primary text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm'} border border-gray-200 dark:border-gray-700 hover:bg-primary hover:text-white font-bold text-sm transition-all duration-300">أخبار تقنية</a>
                 </div>
             `;
-            
-            // إدراج الأزرار فوق المقالات إذا لم تكن موجودة
-            if(!document.getElementById('category-filters-container')) {
-                const filtersContainer = document.createElement('div');
-                filtersContainer.id = 'category-filters-container';
-                filtersContainer.innerHTML = filterHTML;
-                articlesContainer.parentNode.insertBefore(filtersContainer, articlesContainer);
-            }
+            document.getElementById('category-filters-container').innerHTML = filterHTML;
 
+            // --- جلب البيانات وتخزينها للبحث والفلترة ---
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
             onSnapshot(q, (snapshot) => {
-                articlesContainer.innerHTML = '';
+                allArticlesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
-                const articles = [];
-                snapshot.forEach(doc => {
-                    articles.push({ id: doc.id, ...doc.data() });
-                });
-                
-                articles.sort((a, b) => {
+                // ترتيب حسب الأحدث
+                allArticlesData.sort((a, b) => {
                     const timeA = a.createdAt?.seconds || 0;
                     const timeB = b.createdAt?.seconds || 0;
                     return timeB - timeA;
                 });
 
-                let displayCount = 0;
+                renderArticles();
+                renderTrendingSidebar();
+                
+            }, (error) => {
+                articlesContainer.innerHTML = '<div class="col-span-full text-center py-10 text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> خطأ في جلب البيانات: <br>' + error.message + '</div>';
+            });
+        });
 
-                // كود عرض المقالات مع تطبيق الفلترة ونظام الإخفاء
-                articles.forEach((article, index) => {
-                    
-                    // --- الميزة الجديدة: إخفاء المقالات الخاصة من الصفحة الرئيسية ---
-                    if (article.isUnlisted === true) {
-                        return; // تجاوز هذا المقال ولا تقم بعرضه
-                    }
+        // --- دالة عرض المقالات ---
+        function renderArticles() {
+            articlesContainer.innerHTML = '';
+            
+            // 1. فلترة المقالات المخفية والتصنيفات
+            let filtered = allArticlesData.filter(a => !a.isUnlisted);
+            if (selectedCategory) {
+                filtered = filtered.filter(a => a.category === selectedCategory);
+            }
 
-                    // فلترة المقال بناءً على التصنيف المختار
-                    if (selectedCategory && article.category !== selectedCategory) {
-                        return; // تخطي المقال وإخفاؤه
-                    }
-                    
-                    displayCount++;
+            // 2. تطبيق البحث الفوري
+            if (currentSearchTerm.trim() !== '') {
+                const term = currentSearchTerm.toLowerCase();
+                filtered = filtered.filter(a => 
+                    (a.title && a.title.toLowerCase().includes(term)) || 
+                    (a.content && a.content.toLowerCase().includes(term))
+                );
+            }
 
-                    const articleHTML = `
-                        <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300 flex flex-col h-full group">
-                            <a href="article.html?id=${article.id}" class="flex flex-col h-full">
-                                <div class="relative overflow-hidden aspect-video">
-                                    <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600'">
-                                    <span class="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-primary font-bold text-xs px-3 py-1 rounded-full shadow-sm">${article.category}</span>
-                                </div>
-                                <div class="p-5 flex flex-col flex-1">
-                                    <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">${article.title}</h3>
-                                    <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
-                                        ${article.content ? article.content.replace(/<[^>]*>?/gm, '').substring(0, 90) + '...' : 'تطبيق رائع يوفر العديد من الميزات الحصرية...'}
-                                    </p>
-                                    <div class="flex items-center justify-between text-xs text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-download text-primary"></i>
-                                            <span dir="ltr">${article.downloads || '+10,000'}</span>
+            // 3. تحديد العدد المطلوب عرضه
+            const articlesToDisplay = filtered.slice(0, currentLimit);
+
+            if (articlesToDisplay.length === 0) {
+                articlesContainer.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 text-lg font-bold">لم يتم العثور على أي مقالات تطابق بحثك.</div>';
+                loadMoreContainer.classList.add('hidden');
+                return;
+            }
+
+            // 4. رسم المقالات
+            let displayCount = 0;
+            articlesToDisplay.forEach((article, index) => {
+                displayCount++;
+                const articleLink = article.slug ? `article.html?slug=${article.slug}` : `article.html?id=${article.id}`;
+
+                const articleHTML = `
+                    <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300 flex flex-col h-full group card-hover">
+                        <a href="${articleLink}" class="flex flex-col h-full">
+                            <div class="relative overflow-hidden aspect-video">
+                                <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600'">
+                                <span class="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-primary font-bold text-xs px-3 py-1 rounded-full shadow-sm">${article.category}</span>
+                            </div>
+                            <div class="p-5 flex flex-col flex-1">
+                                <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">${article.title}</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
+                                    ${article.content ? article.content.replace(/<[^>]*>?/gm, '').substring(0, 90) + '...' : 'تطبيق رائع يوفر العديد من الميزات الحصرية...'}
+                                </p>
+                                <div class="flex items-center justify-between text-xs text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fa-solid fa-download text-primary"></i>
+                                        <span dir="ltr">${article.downloads || '+10,000'}</span>
+                                    </div>
+                                    <!-- إضافة أيقونة المشاهدات هنا بجانب التقييم -->
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-1 text-blue-400" title="المشاهدات">
+                                            <i class="fa-solid fa-eye"></i>
+                                            <span dir="ltr">${article.views || 0}</span>
                                         </div>
                                         <div class="flex items-center gap-1 text-yellow-500">
                                             <i class="fa-solid fa-star"></i>
@@ -400,58 +390,118 @@
                                         </div>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
+                        </a>
+                    </article>
+                `;
+                articlesContainer.innerHTML += articleHTML;
+
+                // حقن إعلان مدمج بعد كل 4 مقالات
+                if (displayCount % 4 === 0 && index !== articlesToDisplay.length - 1) {
+                    articlesContainer.innerHTML += `
+                        <article class="col-span-full sm:col-span-2 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col justify-center items-center h-full min-h-[150px] text-gray-400 transition-colors shadow-inner">
+                            <span class="text-[10px] mb-2 font-semibold">إعلان مدمج - In-Feed Ad</span>
+                            <i class="fa-solid fa-rectangle-ad text-4xl text-gray-300 dark:text-gray-600"></i>
                         </article>
                     `;
-                    articlesContainer.innerHTML += articleHTML;
-
-                    // إضافة بطاقة إعلانية بعد كل 3 مقالات معروضة فعلياً
-                    if (displayCount % 3 === 0 && index !== articles.length - 1) {
-                        const infeedAdHTML = `
-                            <article class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col justify-center items-center h-full min-h-[250px] text-gray-400 transition-colors">
-                                <span class="text-[10px] mb-2 font-semibold">إعلان مدمج - In-Feed Ad</span>
-                                <i class="fa-solid fa-rectangle-ad text-4xl text-gray-300 dark:text-gray-600"></i>
-                            </article>
-                        `;
-                        articlesContainer.innerHTML += infeedAdHTML;
-                    }
-                });
-
-                // إظهار رسالة إذا كان القسم فارغاً
-                if (displayCount === 0) {
-                    articlesContainer.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 text-lg font-bold">لا توجد مقالات في هذا القسم حالياً.</div>';
                 }
-                
-            }, (error) => {
-                // إظهار الخطأ بوضوح على الشاشة إن وجد
-                console.error("خطأ", error);
-                articlesContainer.innerHTML = '<div class="col-span-full text-center py-10 text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> خطأ في جلب البيانات من قاعدة البيانات: <br>' + error.message + '</div>';
             });
-        }).catch(err => {
-            // إظهار خطأ المصادقة على الشاشة
-            console.error(err);
-            document.getElementById('articles-container').innerHTML = '<div class="col-span-full text-center py-10 text-red-500 font-bold"><i class="fa-solid fa-user-lock"></i> خطأ في تسجيل الدخول (Auth): <br>' + err.message + '</div>';
+
+            // 5. إظهار أو إخفاء زر "عرض المزيد"
+            if (filtered.length > currentLimit) {
+                loadMoreContainer.classList.remove('hidden');
+            } else {
+                loadMoreContainer.classList.add('hidden');
+            }
+        }
+
+        // --- دالة عرض الأكثر تحميلاً في الشريط الجانبي ---
+        function renderTrendingSidebar() {
+            const trendingContainer = document.getElementById('trending-sidebar');
+            const publicArticles = allArticlesData.filter(a => !a.isUnlisted);
+            const topArticles = [...publicArticles].sort((a, b) => (b.actualDownloads || 0) - (a.actualDownloads || 0)).slice(0, 5);
+            
+            if(topArticles.length === 0) {
+                trendingContainer.innerHTML = '<div class="text-sm text-gray-500 text-center">لا توجد مقالات كافية.</div>';
+                return;
+            }
+
+            trendingContainer.innerHTML = '';
+            topArticles.forEach((article, index) => {
+                const articleLink = article.slug ? `article.html?slug=${article.slug}` : `article.html?id=${article.id}`;
+                trendingContainer.innerHTML += `
+                    <a href="${articleLink}" class="trending-item flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition-colors group">
+                        <div class="relative w-16 h-12 flex-shrink-0 overflow-hidden rounded shadow-sm border border-gray-200 dark:border-gray-600">
+                            <img src="${article.imageUrl}" class="trending-img w-full h-full object-cover transition-transform duration-300">
+                            <span class="absolute top-0 right-0 bg-primary text-white text-[9px] font-bold px-1.5 py-0.5 rounded-bl">${index + 1}</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 group-hover:text-primary transition-colors leading-tight">${article.title}</h4>
+                            <span class="text-[11px] text-gray-500 block mt-1"><i class="fa-solid fa-download text-green-500"></i> ${article.actualDownloads || 0} تحميل</span>
+                        </div>
+                    </a>
+                `;
+            });
+        }
+
+        // --- ربط زر تحميل المزيد ---
+        loadMoreBtn.addEventListener('click', () => {
+            currentLimit += 10; 
+            renderArticles();
         });
 
-        // تشغيل نافذة الكوكيز (Cookie Consent)
+        // --- ربط شريط البحث الفوري ---
+        const searchInput = document.getElementById('search-input');
+        const searchInputMobile = document.getElementById('search-input-mobile');
+
+        function handleSearch(e) {
+            currentSearchTerm = e.target.value;
+            currentLimit = 10; 
+            if(e.target.id === 'search-input') searchInputMobile.value = currentSearchTerm;
+            if(e.target.id === 'search-input-mobile') searchInput.value = currentSearchTerm;
+            renderArticles();
+        }
+
+        searchInput.addEventListener('input', handleSearch);
+        searchInputMobile.addEventListener('input', handleSearch);
+
+        // --- تشغيل الوضع الليلي والنافذة ---
         document.addEventListener('DOMContentLoaded', () => {
+            function setupThemeToggle(btnId, darkIconId, lightIconId) {
+                const btn = document.getElementById(btnId);
+                const darkIcon = document.getElementById(darkIconId);
+                const lightIcon = document.getElementById(lightIconId);
+
+                if (!btn || !darkIcon || !lightIcon) return;
+
+                if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    lightIcon.classList.remove('hidden'); document.documentElement.classList.add('dark');
+                } else {
+                    darkIcon.classList.remove('hidden'); document.documentElement.classList.remove('dark');
+                }
+
+                btn.addEventListener('click', function() {
+                    darkIcon.classList.toggle('hidden'); lightIcon.classList.toggle('hidden');
+                    if (localStorage.getItem('color-theme') === 'light') { document.documentElement.classList.add('dark'); localStorage.setItem('color-theme', 'dark'); } 
+                    else { document.documentElement.classList.remove('dark'); localStorage.setItem('color-theme', 'light'); }
+                });
+            }
+
+            setupThemeToggle('theme-toggle', 'theme-toggle-dark-icon', 'theme-toggle-light-icon');
+            setupThemeToggle('theme-toggle-mobile', 'theme-toggle-dark-icon-mobile', 'theme-toggle-light-icon-mobile');
+
             const cookieBanner = document.getElementById('cookie-banner');
             const acceptBtn = document.getElementById('accept-cookies');
-            
-            // التحقق مما إذا كان الزائر قد وافق مسبقاً
             if (!localStorage.getItem('cookiesAccepted')) {
                 cookieBanner.classList.remove('hidden');
-                // تأثير دخول ناعم من الأسفل
                 setTimeout(() => cookieBanner.classList.remove('translate-y-full'), 100);
             }
-            
             acceptBtn.addEventListener('click', () => {
                 localStorage.setItem('cookiesAccepted', 'true');
                 cookieBanner.classList.add('translate-y-full');
                 setTimeout(() => cookieBanner.classList.add('hidden'), 500);
             });
 
-            // --- نظام القائمة الجانبية للهواتف ---
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const closeMobileMenuBtn = document.getElementById('close-mobile-menu');
             const mobileSidebar = document.getElementById('mobile-sidebar');
@@ -460,25 +510,15 @@
             
             function openMobileMenu() {
                 mobileSidebar.classList.remove('hidden');
-                // تأخير بسيط للسماح للمتصفح برسم العنصر قبل بدء الحركة
-                setTimeout(() => {
-                    mobileSidebarOverlay.classList.remove('opacity-0');
-                    mobileSidebarContent.classList.remove('translate-x-full');
-                }, 10);
+                setTimeout(() => { mobileSidebarOverlay.classList.remove('opacity-0'); mobileSidebarContent.classList.remove('translate-x-full'); }, 10);
             }
-
             function closeMobileMenu() {
-                mobileSidebarOverlay.classList.add('opacity-0');
-                mobileSidebarContent.classList.add('translate-x-full');
-                setTimeout(() => {
-                    mobileSidebar.classList.add('hidden');
-                }, 300); // يتوافق مع مدة الحركة (300ms)
+                mobileSidebarOverlay.classList.add('opacity-0'); mobileSidebarContent.classList.add('translate-x-full');
+                setTimeout(() => { mobileSidebar.classList.add('hidden'); }, 300);
             }
-
             if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
             if (closeMobileMenuBtn) closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
             if (mobileSidebarOverlay) mobileSidebarOverlay.addEventListener('click', closeMobileMenu);
-
         });
     </script>
 </body>

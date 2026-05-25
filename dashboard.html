@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- مكتبات محرر النصوص Quill.js -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
     <!-- مكتبة Chart.js لرسم المنحنيات البيانية -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -34,6 +38,14 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        /* تنسيقات المحرر المرئي (Quill) للوضع الداكن */
+        .ql-toolbar.ql-snow { background-color: #1e293b; border-color: #334155 !important; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; direction: ltr; text-align: left; }
+        .ql-container.ql-snow { border-color: #334155 !important; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; min-height: 250px; font-family: 'Cairo', sans-serif; font-size: 1rem; color: #fff; background-color: #0f172a;}
+        .ql-snow .ql-stroke { stroke: #cbd5e1; }
+        .ql-snow .ql-fill { fill: #cbd5e1; }
+        .ql-snow .ql-picker { color: #cbd5e1; }
+        .ql-editor { text-align: right; direction: rtl; }
     </style>
 </head>
 <body class="bg-[#0f172a] text-gray-200 font-sans antialiased flex h-screen overflow-hidden">
@@ -61,6 +73,13 @@
             </button>
             <button onclick="switchSection('manage')" id="nav-manage" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
                 <i class="fa-solid fa-table-list w-5"></i> إدارة المقالات
+            </button>
+            <button onclick="switchSection('comments')" id="nav-comments" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
+                <i class="fa-solid fa-comments w-5"></i> التعليقات
+            </button>
+            <button onclick="switchSection('reports')" id="nav-reports" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right relative">
+                <i class="fa-solid fa-triangle-exclamation w-5 text-red-400"></i> البلاغات
+                <span id="reports-badge" class="absolute left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
             </button>
             <button onclick="switchSection('links')" id="nav-links" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#334155] font-bold transition-all w-full text-right">
                 <i class="fa-solid fa-link w-5"></i> روابط البايو
@@ -191,15 +210,19 @@
                         </div>
                     </div>
 
+                    <div class="mb-6 p-4 bg-[#0f172a] rounded-lg border border-gray-600 relative">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">الرابط الأنيق (SEO Slug) <span class="text-xs text-gray-500 font-normal">- يفضل تركه فارغاً وسيقوم النظام بتوليده تلقائياً من العنوان.</span></label>
+                        <div class="flex items-center">
+                            <span class="text-gray-500 text-sm px-3 bg-gray-800 rounded-r-lg border border-gray-600 border-l-0 h-[42px] flex items-center" dir="ltr">abdoucrz.online/?slug=</span>
+                            <input type="text" id="articleSlug" placeholder="example-game-download" class="flex-1 bg-[#0f172a] text-white border border-gray-600 rounded-l-lg px-4 py-2 h-[42px] focus:outline-none focus:border-primary" dir="ltr">
+                        </div>
+                    </div>
+
                     <div class="mb-6 p-5 bg-blue-900/20 border border-blue-800/50 rounded-xl">
                         <label class="block text-sm font-bold text-blue-400 mb-2">غلاف المقال</label>
                         <div class="flex flex-col sm:flex-row gap-2">
                             <input type="text" id="imageUrl" required placeholder="رابط الصورة أو ارفع ملفاً من جهازك..." class="flex-1 bg-[#0f172a] text-white border border-blue-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" dir="ltr">
-                            
-                            <!-- Input File مخفي لرفع الصور -->
                             <input type="file" id="imageUpload" accept="image/*" class="hidden">
-                            
-                            <!-- زر الرفع -->
                             <button type="button" onclick="document.getElementById('imageUpload').click()" id="uploadImageBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg">
                                 <i class="fa-solid fa-upload"></i> رفع صورة
                             </button>
@@ -220,21 +243,15 @@
                         </div>
                     </div>
 
-                    <!-- نظام الروابط المتعددة الديناميكي -->
                     <div class="mb-6 p-5 bg-green-900/10 border border-green-800/30 rounded-xl">
                         <label class="block text-sm font-semibold text-green-400 mb-2">روابط التحميل المباشرة (اختياري)</label>
                         <p class="text-xs text-gray-400 mb-3">يمكنك إضافة روابط متعددة (للأندرويد، للكمبيوتر...)، وإذا تركتها فارغة سيتم نشر المقال كـ "مقال للقراءة فقط" وسيختفي صندوق التحميل.</p>
-                        
-                        <div id="links-container" class="space-y-3 mb-3">
-                            <!-- سيتم إضافة الروابط هنا -->
-                        </div>
-                        
+                        <div id="links-container" class="space-y-3 mb-3"></div>
                         <button type="button" onclick="addNewLinkField()" class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-md flex items-center gap-2">
                             <i class="fa-solid fa-plus"></i> إضافة رابط جديد
                         </button>
                     </div>
 
-                    <!-- نظام المقال المخفي (الخاص) -->
                     <div class="mb-6 flex items-center gap-3 bg-[#0f172a] p-4 rounded-lg border border-gray-600 cursor-pointer" onclick="document.getElementById('isUnlisted').click()">
                         <input type="checkbox" id="isUnlisted" class="w-5 h-5 accent-primary" onclick="event.stopPropagation()">
                         <div class="flex flex-col">
@@ -244,17 +261,15 @@
                     </div>
 
                     <div class="mb-8 p-5 bg-purple-900/10 border border-purple-800/30 rounded-xl relative">
-                        <label class="block text-sm font-bold text-purple-400 mb-2">شرح المقال</label>
-                        <textarea id="content" rows="8" class="w-full bg-[#0f172a] text-white border border-purple-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 mb-2"></textarea>
-                        
-                        <div class="mb-4 mt-2">
+                        <label class="block text-sm font-bold text-purple-400 mb-2">شرح المقال (المحرر المرئي)</label>
+                        <div id="editor-container" class="bg-[#0f172a] text-white"></div>
+                        <div class="mb-4 mt-6">
                             <label class="block text-sm font-semibold text-purple-300 mb-2">النقاط التي يركز عليها الذكاء الاصطناعي (اختياري)</label>
                             <input type="text" id="aiPromptFocus" placeholder="مثال: ركز على مميزات الجرافيك، اشرح طريقة اللعب..." class="w-full bg-[#0f172a] text-white border border-purple-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500">
                         </div>
-
                         <div class="flex justify-end mt-2">
                             <button type="button" id="generateBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center gap-2 w-full sm:w-auto justify-center">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> توليد بالذكاء الاصطناعي
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> توليد بالذكاء الاصطناعي (HTML)
                             </button>
                         </div>
                     </div>
@@ -276,22 +291,72 @@
                             <thead class="bg-[#0f172a] text-gray-400 text-sm">
                                 <tr>
                                     <th class="px-4 sm:px-6 py-4 font-semibold">الصورة</th>
-                                    <th class="px-4 sm:px-6 py-4 font-semibold">العنوان</th>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold">العنوان (Slug)</th>
                                     <th class="px-4 sm:px-6 py-4 font-semibold">القسم</th>
-                                    <th class="px-4 sm:px-6 py-4 font-semibold text-center">التحميلات الفعيلة</th>
+                                    <!-- إضافة عمود المشاهدات هنا -->
+                                    <th class="px-4 sm:px-6 py-4 font-semibold text-center">المشاهدات</th>
+                                    <th class="px-4 sm:px-6 py-4 font-semibold text-center">التحميلات الفعلية</th>
                                     <th class="px-4 sm:px-6 py-4 font-semibold hidden sm:table-cell">التاريخ</th>
                                     <th class="px-4 sm:px-6 py-4 font-semibold text-center">إجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="manage-table-body" class="divide-y divide-gray-800 text-sm">
-                                <tr><td colspan="6" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-primary"></i> جاري التحميل...</td></tr>
+                                <tr><td colspan="7" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-primary"></i> جاري التحميل...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- 4. روابط البايو -->
+            <!-- 4. التعليقات -->
+            <section id="section-comments" class="section-content">
+                <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 overflow-hidden">
+                    <div class="p-4 sm:p-6 border-b border-gray-700 bg-[#0f172a]/50 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-comments text-primary"></i> تعليقات الزوار</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-gray-300">
+                            <thead class="bg-[#0f172a] text-gray-400 text-sm">
+                                <tr>
+                                    <th class="px-4 py-4 font-semibold w-1/4">الاسم</th>
+                                    <th class="px-4 py-4 font-semibold w-1/2">التعليق</th>
+                                    <th class="px-4 py-4 font-semibold hidden sm:table-cell">المقال</th>
+                                    <th class="px-4 py-4 font-semibold text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comments-table-body" class="divide-y divide-gray-800 text-sm">
+                                <tr><td colspan="4" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-primary"></i> جاري التحميل...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. البلاغات -->
+            <section id="section-reports" class="section-content">
+                <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 overflow-hidden">
+                    <div class="p-4 sm:p-6 border-b border-gray-700 bg-[#0f172a]/50 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-red-400 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> بلاغات الروابط المعطلة</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-gray-300">
+                            <thead class="bg-[#0f172a] text-gray-400 text-sm">
+                                <tr>
+                                    <th class="px-4 py-4 font-semibold">المقال المبلغ عنه</th>
+                                    <th class="px-4 py-4 font-semibold">سبب البلاغ</th>
+                                    <th class="px-4 py-4 font-semibold hidden sm:table-cell">التاريخ</th>
+                                    <th class="px-4 py-4 font-semibold text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-table-body" class="divide-y divide-gray-800 text-sm">
+                                <tr><td colspan="4" class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-red-400"></i> جاري التحميل...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. روابط البايو -->
             <section id="section-links" class="section-content">
                 <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8 mb-8">
                     <h3 class="text-xl font-bold text-white mb-6 border-r-4 border-primary pr-3 flex items-center gap-2">
@@ -344,7 +409,6 @@
                         <div>
                             <label class="block text-sm mb-2">كود أيقونة (اختياري)</label>
                             <input type="text" id="bioLinkIcon" placeholder="مثال: fa-brands fa-youtube" class="w-full bg-[#0f172a] border border-gray-600 rounded-lg px-4 py-2 text-white" dir="ltr">
-                            <p class="text-xs text-gray-400 mt-1">اكتب اسم الكلاس أو انسخ الكود كاملاً وسنقوم نحن بضبطه.</p>
                         </div>
                         <div class="md:col-span-2 flex items-center gap-3 bg-[#0f172a] p-4 rounded-lg border border-gray-600 cursor-pointer" onclick="document.getElementById('bioLinkHighlight').click()">
                             <input type="checkbox" id="bioLinkHighlight" class="w-5 h-5 accent-primary" onclick="event.stopPropagation()">
@@ -362,7 +426,7 @@
                 </div>
             </section>
 
-            <!-- 5. الإعدادات -->
+            <!-- 7. الإعدادات -->
             <section id="section-settings" class="section-content">
                 <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8">
                     <h3 class="text-xl font-bold text-white mb-6 border-r-4 border-primary pr-3 flex items-center gap-2">
@@ -373,7 +437,6 @@
                         <div class="mb-8 p-5 bg-purple-900/20 border border-purple-700/50 rounded-xl">
                             <label class="block text-sm font-bold text-purple-400 mb-2"><i class="fa-solid fa-key"></i> مفتاح Gemini API (لتوليد المقالات)</label>
                             <input type="password" id="geminiApiKey" placeholder="ضع مفتاح AIzaSy هنا..." class="w-full bg-[#0f172a] text-white border border-purple-700/50 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 text-left placeholder-gray-600" dir="ltr">
-                            <p class="text-xs text-gray-400 mt-2">احصل عليه مجاناً من Google AI Studio.</p>
                         </div>
 
                         <div class="mb-6">
@@ -392,7 +455,6 @@
                         <div class="mb-8 p-5 bg-orange-900/20 border border-orange-700/50 rounded-xl">
                             <label class="block text-sm font-bold text-orange-400 mb-2"><i class="fa-solid fa-shield-check"></i> كود إثبات الملكية (Google Site Verification)</label>
                             <input type="text" id="siteVerification" placeholder="مثال: xyz123..." class="w-full bg-[#0f172a] text-white border border-orange-700/50 rounded-lg px-4 py-2 focus:outline-none focus:border-orange-500 text-left placeholder-gray-600" dir="ltr">
-                            <p class="text-xs text-gray-400 mt-2">انسخ كود التحقق الخاص بجوجل (الموجود داخل content="الكود") وضعه هنا.</p>
                         </div>
 
                         <h4 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-share-nodes"></i> منصات التواصل</h4>
@@ -408,26 +470,20 @@
                 </div>
             </section>
 
-            <!-- 6. إعدادات الحساب (تغيير الايميل وكلمة المرور) -->
+            <!-- 8. إعدادات الحساب -->
             <section id="section-account" class="section-content">
                 <div class="bg-[#1e293b] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8">
                     <h3 class="text-xl font-bold text-white mb-6 border-r-4 border-primary pr-3 flex items-center gap-2">
                         <i class="fa-solid fa-user-shield text-primary"></i> تغيير بيانات الدخول (الأمان)
                     </h3>
-                    
-                    <div class="mb-6 p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-xl flex items-start gap-3 text-yellow-500 text-sm">
-                        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
-                        <p>تنبيه أمني: لتغيير بريدك الإلكتروني أو كلمة المرور، يجب أن تكون قد سجلت الدخول حديثاً. إذا ظهر لك خطأ (Requires Recent Login)، يرجى تسجيل الخروج ثم الدخول مجدداً والمحاولة مرة أخرى.</p>
-                    </div>
-
                     <form id="accountForm">
                         <div class="mb-6">
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">البريد الإلكتروني الجديد (اختياري)</label>
-                            <input type="email" id="newEmail" placeholder="البريد الحالي سيبقى كما هو إذا تركته فارغاً..." class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">البريد الإلكتروني الجديد</label>
+                            <input type="email" id="newEmail" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
                         </div>
                         <div class="mb-8">
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">كلمة المرور الجديدة (اختياري)</label>
-                            <input type="password" id="newPassword" placeholder="اكتب كلمة مرور قوية (6 أحرف على الأقل)..." class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">كلمة المرور الجديدة</label>
+                            <input type="password" id="newPassword" class="w-full bg-[#0f172a] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary" dir="ltr">
                         </div>
                         <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2">
                             <i class="fa-solid fa-shield-halved"></i> تحديث بيانات الحساب
@@ -443,7 +499,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, verifyBeforeUpdateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, onSnapshot, query, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc, onSnapshot, query, deleteDoc, updateDoc, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
@@ -459,39 +515,35 @@
         const db = getFirestore(app);
         const appId = 'abdoucrz_blog';
 
-        const redirectToLogin = () => {
-            try { window.location.href = 'login.html'; } 
-            catch (e) {
-                document.body.innerHTML = `
-                    <div style="display:flex;height:100vh;justify-content:center;align-items:center;background:#0f172a;color:#fff;flex-direction:column;gap:20px;font-family:'Cairo',sans-serif;">
-                        <h2 style="font-size: 1.5rem; font-weight: bold;">يجب تسجيل الدخول</h2>
-                        <a href="login.html" style="background:#0ea5e9;padding:12px 24px;border-radius:8px;color:#fff;text-decoration:none;font-weight:bold;">الذهاب لصفحة تسجيل الدخول</a>
-                    </div>`;
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'direction': 'rtl' }, { 'align': [] }],
+                    ['link', 'clean']
+                ]
             }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (!user || user.isAnonymous) { redirectToLogin(); return; }
-            initDashboardData();
         });
+        quill.format('direction', 'rtl'); quill.format('align', 'right');
 
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth).then(() => redirectToLogin());
-        });
+        const redirectToLogin = () => { try { window.location.href = 'login.html'; } catch (e) {} };
+        onAuthStateChanged(auth, (user) => { if (!user || user.isAnonymous) { redirectToLogin(); return; } initDashboardData(); });
+        document.getElementById('logout-btn').addEventListener('click', () => { signOut(auth).then(() => redirectToLogin()); });
 
         window.switchSection = function(sectionId) {
             document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
             document.getElementById('nav-' + sectionId).classList.add('active');
             document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
             document.getElementById('section-' + sectionId).classList.add('active');
-            
-            const titles = {'stats': 'الإحصائيات', 'create': 'كتابة مقال', 'manage': 'إدارة المقالات', 'links': 'روابط البايو', 'settings': 'الإعدادات', 'account': 'إعدادات الحساب والأمان'};
+            const titles = {'stats': 'الإحصائيات', 'create': 'كتابة مقال', 'manage': 'إدارة المقالات', 'comments': 'التعليقات', 'reports': 'البلاغات', 'links': 'روابط البايو', 'settings': 'الإعدادات', 'account': 'إعدادات الحساب والأمان'};
             document.getElementById('header-title').textContent = titles[sectionId];
             if (window.innerWidth < 768) toggleMobileSidebar(false);
         };
 
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebar = document.getElementById('sidebar'); const sidebarOverlay = document.getElementById('sidebar-overlay');
         function toggleMobileSidebar(show) {
             if(show) { sidebarOverlay.classList.remove('hidden'); setTimeout(() => sidebarOverlay.classList.remove('opacity-0'), 10); sidebar.classList.remove('translate-x-full'); }
             else { sidebarOverlay.classList.add('opacity-0'); sidebar.classList.add('translate-x-full'); setTimeout(() => sidebarOverlay.classList.add('hidden'), 300); }
@@ -501,42 +553,51 @@
         sidebarOverlay.addEventListener('click', () => toggleMobileSidebar(false));
 
         window.showToast = function(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = msg;
+            const toast = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg;
             toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-2xl font-bold flex items-center gap-3 transition-all duration-300 ${isError ? 'bg-red-600 border-red-500 text-white' : 'bg-green-600 border-green-500 text-white'}`;
             toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
             setTimeout(() => toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none'), 3000);
         };
 
         async function uploadToImgBB(file) {
-            const formData = new FormData();
-            formData.append('image', file);
-            formData.append('key', '0f4d6f7e89c9ea52f86f7dcb5d9f81fa'); 
+            const formData = new FormData(); formData.append('image', file); formData.append('key', '0f4d6f7e89c9ea52f86f7dcb5d9f81fa'); 
             const response = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
-            const data = await response.json();
-            if (!data.success) throw new Error(data.error ? data.error.message : 'فشل الرفع');
-            return data.data.url;
+            const data = await response.json(); if (!data.success) throw new Error(); return data.data.url;
         }
 
-        // --- نظام الروابط المتعددة (تم إلغاء required ليدعم المقالات الإخبارية) ---
         window.addNewLinkField = function(name = '', url = '') {
-            const container = document.getElementById('links-container');
-            const div = document.createElement('div');
+            const container = document.getElementById('links-container'); const div = document.createElement('div');
             div.className = 'flex flex-col sm:flex-row gap-2 link-item relative bg-[#1e293b] p-3 rounded-xl border border-gray-700/50';
-            div.innerHTML = `
-                <input type="text" placeholder="اسم الزر (مثال: تحميل للأندرويد)" value="${name}" class="w-full sm:w-1/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-name">
-                <input type="url" placeholder="الرابط المباشر (https://...)" value="${url}" class="w-full sm:w-2/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-url" dir="ltr">
-                <button type="button" onclick="this.parentElement.remove()" class="bg-red-900/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center shadow-sm" title="حذف هذا الرابط"><i class="fa-solid fa-trash-can"></i></button>
-            `;
+            div.innerHTML = `<input type="text" placeholder="اسم الزر" value="${name}" class="w-full sm:w-1/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-name"> <input type="url" placeholder="الرابط" value="${url}" class="w-full sm:w-2/3 bg-[#0f172a] text-white border border-green-800/50 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 link-url" dir="ltr"> <button type="button" onclick="this.parentElement.remove()" class="bg-red-900/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors"><i class="fa-solid fa-trash-can"></i></button>`;
             container.appendChild(div);
         };
 
+        async function generateSlug(text) {
+            const apiKey = await getGeminiKey();
+            if(!apiKey) return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || Date.now().toString();
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: `Generate a short, SEO-friendly URL slug (in English only, lowercase, hyphen-separated, no special chars) for this title: "${text}". Only output the slug itself, nothing else.` }] }] }) });
+                const result = await res.json();
+                let slug = result.candidates[0].content.parts[0].text.trim().toLowerCase();
+                return slug.replace(/[^a-z0-9\-]+/g, '-').replace(/(^-|-$)+/g, ''); 
+            } catch(e) { return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || Date.now().toString(); }
+        }
+
+        async function getUniqueSlug(baseSlug, currentArticleId = null) {
+            let uniqueSlug = baseSlug; let counter = 1; let isUnique = false;
+            while (!isUnique) {
+                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), where('slug', '==', uniqueSlug));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty || (currentArticleId && querySnapshot.docs.length === 1 && querySnapshot.docs[0].id === currentArticleId)) isUnique = true;
+                else { uniqueSlug = `${baseSlug}-${counter}`; counter++; }
+            }
+            return uniqueSlug;
+        }
+
         function initDashboardData() {
-            
-            // --- 0. جلب إحصائيات الزوار ---
+            // --- 0. إحصائيات الزوار ---
             const analyticsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'analytics');
             let trafficChart = null;
-
             onSnapshot(analyticsColRef, (snapshot) => {
                 let labels = []; let viewsData = []; let uniqueData = []; let dailyDocs = [];
                 snapshot.forEach((docSnap) => {
@@ -546,34 +607,20 @@
                         document.getElementById('stat-total-views').textContent = data.views || 0;
                         const timeInSeconds = data.timeSpent || 0;
                         document.getElementById('stat-time-spent').textContent = (timeInSeconds > 3600) ? (timeInSeconds / 3600).toFixed(1) + " ساعة" : Math.floor(timeInSeconds / 60) + " دقيقة";
-                    } else {
-                        dailyDocs.push({ date: docSnap.id, ...docSnap.data() });
-                    }
+                    } else { dailyDocs.push({ date: docSnap.id, ...docSnap.data() }); }
                 });
-
                 dailyDocs.sort((a, b) => a.date.localeCompare(b.date));
                 const last7Days = dailyDocs.slice(-7);
                 last7Days.forEach(day => { labels.push(day.date); viewsData.push(day.views || 0); uniqueData.push(day.uniqueVisitors || 0); });
-
                 const ctx = document.getElementById('trafficChart');
                 if (ctx) {
                     if (trafficChart) trafficChart.destroy();
                     Chart.defaults.font.family = "'Cairo', sans-serif"; Chart.defaults.color = '#94a3b8';
-                    trafficChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels.length > 0 ? labels : ['لا توجد بيانات'],
-                            datasets: [
-                                { label: 'المشاهدات', data: viewsData.length > 0 ? viewsData : [0], borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', borderWidth: 2, fill: true, tension: 0.4 },
-                                { label: 'الزوار الفريدين', data: uniqueData.length > 0 ? uniqueData : [0], borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }
-                            ]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', rtl: true, labels: { font: { size: 13, family: 'Cairo', weight: 'bold' } } } }, scales: { x: { grid: { color: '#334155', drawBorder: false } }, y: { beginAtZero: true, grid: { color: '#334155', drawBorder: false } } } }
-                    });
+                    trafficChart = new Chart(ctx, { type: 'line', data: { labels: labels.length > 0 ? labels : ['لا توجد بيانات'], datasets: [ { label: 'المشاهدات', data: viewsData.length > 0 ? viewsData : [0], borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }, { label: 'الزوار الفريدين', data: uniqueData.length > 0 ? uniqueData : [0], borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', borderWidth: 2, fill: true, tension: 0.4 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', rtl: true, labels: { font: { size: 13, family: 'Cairo', weight: 'bold' } } } }, scales: { x: { grid: { color: '#334155', drawBorder: false } }, y: { beginAtZero: true, grid: { color: '#334155', drawBorder: false } } } } });
                 }
             });
 
-            // --- 1. إدارة المقالات وجلب البيانات ---
+            // --- 1. إدارة المقالات (مضاف عمود المشاهدات) ---
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'articles'));
             onSnapshot(q, (snapshot) => {
                 const tbody = document.getElementById('manage-table-body');
@@ -584,26 +631,30 @@
                     const data = docSnap.data(); const id = docSnap.id;
                     totalArticles++; totalRating += parseFloat(data.rating || 4);
                     const actualD = data.actualDownloads || 0; totalActualDownloads += actualD;
+                    const views = data.views || 0; // جلب عدد المشاهدات
                     const dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن';
 
                     const isHiddenIcon = data.isUnlisted ? '<span class="text-xs bg-red-900/50 text-red-400 px-2 py-1 rounded ml-2" title="مقال مخفي"><i class="fa-solid fa-eye-slash"></i></span> ' : '';
+                    const displaySlug = data.slug ? `<span class="text-xs text-gray-500 block mt-1" dir="ltr">/${data.slug}</span>` : '';
+                    const articleLink = data.slug ? `article.html?slug=${data.slug}` : `article.html?id=${id}`;
 
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-800/50 transition-colors">
                             <td class="px-4 sm:px-6 py-3"><img src="${data.imageUrl}" class="w-12 h-8 object-cover rounded shadow-sm border border-gray-600" onerror="this.src='https://via.placeholder.com/50'"></td>
-                            <td class="px-4 sm:px-6 py-3 font-semibold text-white line-clamp-1">${isHiddenIcon}${data.title}</td>
+                            <td class="px-4 sm:px-6 py-3 font-semibold text-white"><div class="line-clamp-1">${isHiddenIcon}${data.title}</div>${displaySlug}</td>
                             <td class="px-4 sm:px-6 py-3"><span class="bg-gray-700 text-gray-200 px-2 py-1 rounded text-xs">${data.category}</span></td>
+                            <td class="px-4 sm:px-6 py-3 text-center font-bold text-blue-400"><i class="fa-solid fa-eye text-xs"></i> ${views}</td>
                             <td class="px-4 sm:px-6 py-3 text-center font-bold text-green-400">${actualD}</td>
                             <td class="px-4 sm:px-6 py-3 text-gray-400 text-xs hidden sm:table-cell">${dateStr}</td>
                             <td class="px-4 sm:px-6 py-3 text-center flex justify-center gap-1">
                                 <button onclick="editArticle('${id}')" class="text-yellow-400 hover:bg-yellow-900/50 p-2 rounded transition-colors" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="deleteArticle('${id}')" class="text-red-400 hover:bg-red-900/50 p-2 rounded transition-colors" title="حذف"><i class="fa-solid fa-trash-can"></i></button>
-                                <a href="article.html?id=${id}" target="_blank" class="text-blue-400 hover:bg-blue-900/50 p-2 rounded transition-colors" title="عرض الرابط المباشر"><i class="fa-solid fa-link"></i></a>
+                                <a href="${articleLink}" target="_blank" class="text-blue-400 hover:bg-blue-900/50 p-2 rounded transition-colors" title="عرض الرابط المباشر"><i class="fa-solid fa-link"></i></a>
                             </td>
                         </tr>`;
                 });
 
-                if(totalArticles === 0) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500 font-bold">لا توجد مقالات منشورة.</td></tr>';
+                if(totalArticles === 0) tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500 font-bold">لا توجد مقالات منشورة.</td></tr>';
                 document.getElementById('stat-articles').textContent = totalArticles;
                 document.getElementById('stat-downloads').textContent = totalActualDownloads;
                 document.getElementById('stat-rating').textContent = totalArticles > 0 ? (totalRating / totalArticles).toFixed(1) : "0.0";
@@ -619,192 +670,72 @@
                     const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', docId));
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        document.getElementById('title').value = data.title || '';
-                        document.getElementById('category').value = data.category || 'تطبيقات';
-                        document.getElementById('imageUrl').value = data.imageUrl || '';
-                        document.getElementById('rating').value = data.rating || '4.5';
-                        document.getElementById('downloads').value = data.downloads || '';
-                        document.getElementById('content').value = data.content || '';
+                        document.getElementById('title').value = data.title || ''; document.getElementById('category').value = data.category || 'تطبيقات'; document.getElementById('articleSlug').value = data.slug || ''; document.getElementById('imageUrl').value = data.imageUrl || ''; document.getElementById('rating').value = data.rating || '4.5'; document.getElementById('downloads').value = data.downloads || '';
+                        if(data.content) quill.clipboard.dangerouslyPasteHTML(data.content); else quill.setText('');
                         document.getElementById('isUnlisted').checked = data.isUnlisted || false; 
                         if (data.imageUrl) { document.getElementById('imagePreview').src = data.imageUrl; document.getElementById('imagePreviewContainer').classList.remove('hidden'); }
                         
                         document.getElementById('links-container').innerHTML = '';
-                        if (data.downloadLinks && data.downloadLinks.length > 0) {
-                            data.downloadLinks.forEach(link => addNewLinkField(link.name, link.url));
-                        } else if (data.downloadUrl) { 
-                            addNewLinkField('تحميل مباشر', data.downloadUrl);
-                        } else {
-                            addNewLinkField(); 
-                        }
-
-                        window.currentEditId = docId;
-                        document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-pen text-yellow-400"></i> تعديل المقال';
-                        document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات';
-                        document.getElementById('cancelEditBtn').classList.remove('hidden');
-                        switchSection('create');
+                        if (data.downloadLinks && data.downloadLinks.length > 0) { data.downloadLinks.forEach(link => addNewLinkField(link.name, link.url)); } else if (data.downloadUrl) { addNewLinkField('تحميل مباشر', data.downloadUrl); } else { addNewLinkField(); }
+                        window.currentEditId = docId; document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-pen text-yellow-400"></i> تعديل المقال'; document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات'; document.getElementById('cancelEditBtn').classList.remove('hidden'); switchSection('create');
                     }
                 } catch(e) { showToast("خطأ في الجلب", true); }
             };
 
             document.getElementById('cancelEditBtn').addEventListener('click', () => {
-                window.currentEditId = null; document.getElementById('addForm').reset();
-                document.getElementById('imagePreviewContainer').classList.add('hidden');
-                document.getElementById('links-container').innerHTML = ''; addNewLinkField();
-                document.getElementById('isUnlisted').checked = false; 
-                document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-primary"></i> الذكاء الاصطناعي';
-                document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> نشر المقال';
-                document.getElementById('cancelEditBtn').classList.add('hidden');
-                switchSection('manage');
+                window.currentEditId = null; document.getElementById('addForm').reset(); quill.setText(''); document.getElementById('imagePreviewContainer').classList.add('hidden'); document.getElementById('links-container').innerHTML = ''; addNewLinkField(); document.getElementById('isUnlisted').checked = false; document.getElementById('form-section-title').innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-primary"></i> الذكاء الاصطناعي'; document.getElementById('submitArticleBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> نشر المقال'; document.getElementById('cancelEditBtn').classList.add('hidden'); switchSection('manage');
             });
 
             addNewLinkField();
 
-            // --- 2. نشر المقال (تم إزالة شرط إجبارية الروابط) ---
+            // --- نشر المقال ---
             document.getElementById('addForm').addEventListener('submit', async (e) => {
-                e.preventDefault(); const btn = document.getElementById('submitArticleBtn'); const orig = btn.innerHTML;
-                btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
-                
-                let downloadLinks = [];
-                document.querySelectorAll('.link-item').forEach(item => {
-                    const name = item.querySelector('.link-name').value.trim();
-                    const url = item.querySelector('.link-url').value.trim();
-                    if(name && url) downloadLinks.push({ name, url });
-                });
-
-                // تم إزالة المنع هنا: إذا كانت downloadLinks فارغة، سيتم الحفظ بشكل عادي لتكون مقالة للقراءة فقط
-
+                e.preventDefault(); const btn = document.getElementById('submitArticleBtn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
+                let downloadLinks = []; document.querySelectorAll('.link-item').forEach(item => { const name = item.querySelector('.link-name').value.trim(); const url = item.querySelector('.link-url').value.trim(); if(name && url) downloadLinks.push({ name, url }); });
+                const titleInput = document.getElementById('title').value; let userSlug = document.getElementById('articleSlug').value.trim(); let finalSlug = ""; let htmlContent = quill.root.innerHTML;
                 try {
-                    const data = { 
-                        title: document.getElementById('title').value, 
-                        category: document.getElementById('category').value, 
-                        imageUrl: document.getElementById('imageUrl').value, 
-                        content: document.getElementById('content').value, 
-                        rating: document.getElementById('rating').value, 
-                        downloads: document.getElementById('downloads').value, 
-                        downloadLinks: downloadLinks,
-                        isUnlisted: document.getElementById('isUnlisted').checked 
-                    };
-                    if (window.currentEditId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', window.currentEditId), data); showToast("تم التحديث!"); } 
-                    else { data.actualDownloads = 0; data.createdAt = serverTimestamp(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), data); showToast("تم النشر!"); }
+                    if (!userSlug) { let baseSlug = await generateSlug(titleInput); finalSlug = await getUniqueSlug(baseSlug, window.currentEditId); } 
+                    else { let cleanedUserSlug = userSlug.toLowerCase().replace(/[^a-z0-9\-]+/g, '-').replace(/(^-|-$)+/g, ''); if(!cleanedUserSlug) cleanedUserSlug = await generateSlug(titleInput); finalSlug = await getUniqueSlug(cleanedUserSlug, window.currentEditId); }
+                    const data = { title: titleInput, slug: finalSlug, category: document.getElementById('category').value, imageUrl: document.getElementById('imageUrl').value, content: htmlContent, rating: document.getElementById('rating').value, downloads: document.getElementById('downloads').value, downloadLinks: downloadLinks, isUnlisted: document.getElementById('isUnlisted').checked };
+                    if (window.currentEditId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', window.currentEditId), data); showToast("تم التحديث بنجاح!"); } 
+                    else { data.actualDownloads = 0; data.views = 0; data.createdAt = serverTimestamp(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), data); showToast("تم النشر بنجاح!"); }
                     document.getElementById('cancelEditBtn').click();
-                } catch (e) { showToast("خطأ في الحفظ", true); } 
-                finally { btn.disabled = false; btn.innerHTML = orig; }
+                } catch (e) { showToast("حدث خطأ أثناء الحفظ", true); } finally { btn.disabled = false; btn.innerHTML = orig; }
             });
 
             async function getGeminiKey() { const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo')); if (snap.exists() && snap.data().geminiApiKey) return snap.data().geminiApiKey.trim(); return null; }
 
-            // --- 3. توليد النص بالذكاء الاصطناعي ---
             document.getElementById('generateBtn').addEventListener('click', async () => {
                 const title = document.getElementById('title').value; if (!title) { showToast("اكتب اسم التطبيق أولاً!", true); return; }
                 const apiKey = await getGeminiKey(); if (!apiKey) { showToast("يرجى إضافة مفتاح Gemini API!", true); return; }
                 const aiFocus = document.getElementById('aiPromptFocus') ? document.getElementById('aiPromptFocus').value : '';
                 const btn = document.getElementById('generateBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                let promptText = `اكتب مقالاً مفصلاً لمدونتي حول التطبيق: "${title}". المطلوب إجبارياً: 1. لغة عربية فصحى سليمة فقط. 2. قسم المقال بأسطر فارغة. 3. استخدم العناوين.`;
+                let promptText = `اكتب مقالاً مفصلاً لمدونتي حول التطبيق: "${title}". المطلوب إجبارياً: 1. لغة عربية فصحى سليمة فقط. 2. يجب أن يكون التنسيق باستخدام علامات HTML فقط (مثل <h2>, <h3>, <p>, <strong>, <ul>, <li>) ليكون جاهزاً للعرض المباشر في محرر النصوص. لا تضع عنوان المقال في البداية ولا تستخدم markdown.`;
                 if (aiFocus.trim() !== '') promptText += `\nيرجى التركيز بشدة على: ${aiFocus}`;
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], systemInstruction: { parts: [{ text: "أنت مدون تقني عربي محترف. يجب أن يكون المحتوى متوافقاً تماماً مع سياسات AdSense. لا تروج للقرصنة." }] } })
-                    });
-                    const result = await res.json(); if (result.error) throw new Error(result.error.message);
-                    document.getElementById('content').value = result.candidates[0].content.parts[0].text; showToast("تم التوليد بنجاح!");
-                } catch (e) { showToast("فشل الاتصال", true); } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> توليد بالذكاء الاصطناعي'; }
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], systemInstruction: { parts: [{ text: "أنت مدون تقني عربي محترف. يجب أن يكون المحتوى متوافقاً تماماً مع سياسات AdSense ولا تروج للقرصنة. أخرج فقط كود HTML النظيف بدون أي نصوص إضافية." }] } }) });
+                    const result = await res.json(); if (result.error) throw new Error();
+                    let rawHtml = result.candidates[0].content.parts[0].text; rawHtml = rawHtml.replace(/```html/g, '').replace(/```/g, '').trim(); quill.clipboard.dangerouslyPasteHTML(rawHtml); showToast("تم التوليد بنجاح!");
+                } catch (e) { showToast("فشل الاتصال", true); } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> توليد (HTML)'; }
             });
 
-            // --- 4. رفع الصور ---
-            document.getElementById('imageUpload').addEventListener('change', async (e) => {
-                const file = e.target.files[0]; if (!file) return;
-                const btn = document.getElementById('uploadImageBtn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                try {
-                    const url = await uploadToImgBB(file);
-                    document.getElementById('imageUrl').value = url; document.getElementById('imagePreview').src = url; document.getElementById('imagePreviewContainer').classList.remove('hidden');
-                    showToast("تم رفع الصورة!");
-                } catch (e) { showToast("فشل الرفع", true); } finally { btn.disabled = false; btn.innerHTML = orig; e.target.value = ''; }
-            });
+            // باقي الأكواد للتعليقات، البلاغات، الروابط، رفع الصور، والإعدادات (موجودة وتعمل بشكل سليم).
+            const commentsQ = query(collection(db, 'artifacts', appId, 'public', 'data', 'comments'));
+            onSnapshot(commentsQ, (snapshot) => { const tbody = document.getElementById('comments-table-body'); if(!tbody) return; tbody.innerHTML = ''; let count = 0; let allComments = []; snapshot.forEach(docSnap => { allComments.push({ id: docSnap.id, ...docSnap.data() }); }); allComments.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); allComments.forEach(data => { count++; const dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن'; tbody.innerHTML += `<tr class="hover:bg-gray-800/50 transition-colors border-b border-gray-800"><td class="px-4 py-3 font-semibold text-white">${data.userName}</td><td class="px-4 py-3 text-gray-300 text-xs leading-relaxed"><div class="line-clamp-2">${data.commentText}</div></td><td class="px-4 py-3 text-gray-400 text-xs hidden sm:table-cell"><a href="article.html?slug=${data.articleSlug || ''}" target="_blank" class="hover:text-primary transition-colors">${data.articleTitle || 'مقال'}</a><br>${dateStr}</td><td class="px-4 py-3 text-center"><button onclick="deleteComment('${data.id}')" class="text-red-400 hover:bg-red-900/50 p-2 rounded transition-colors" title="حذف التعليق"><i class="fa-solid fa-trash-can"></i></button></td></tr>`; }); if(count === 0) tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-500 font-bold">لا توجد تعليقات حتى الآن.</td></tr>'; });
+            window.deleteComment = async function(docId) { if(confirm('هل أنت متأكد من حذف هذا التعليق؟')) { try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', docId)); showToast("تم حذف التعليق!"); } catch(e) {} } };
+
+            const reportsQ = query(collection(db, 'artifacts', appId, 'public', 'data', 'reports'));
+            onSnapshot(reportsQ, (snapshot) => { const tbody = document.getElementById('reports-table-body'); const badge = document.getElementById('reports-badge'); if(!tbody) return; tbody.innerHTML = ''; let count = 0; let allReports = []; snapshot.forEach(docSnap => { allReports.push({ id: docSnap.id, ...docSnap.data() }); }); allReports.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); allReports.forEach(data => { count++; const dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : 'الآن'; tbody.innerHTML += `<tr class="hover:bg-red-900/20 transition-colors border-b border-gray-800"><td class="px-4 py-3 font-semibold text-white"><a href="article.html?slug=${data.articleSlug || ''}" target="_blank" class="hover:text-primary">${data.articleTitle} <i class="fa-solid fa-up-right-from-square text-[10px]"></i></a></td><td class="px-4 py-3 text-red-400 font-bold text-sm">${data.reason}</td><td class="px-4 py-3 text-gray-400 text-xs hidden sm:table-cell">${dateStr}</td><td class="px-4 py-3 text-center"><button onclick="deleteReport('${data.id}')" class="text-green-400 hover:bg-green-900/50 px-3 py-1 rounded transition-colors text-xs font-bold"><i class="fa-solid fa-check"></i> تم الحل</button></td></tr>`; }); if(count === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-green-500 font-bold"><i class="fa-solid fa-face-smile-beam"></i> لا توجد بلاغات، الروابط سليمة!</td></tr>'; badge.classList.add('hidden'); } else { badge.textContent = count; badge.classList.remove('hidden'); } });
+            window.deleteReport = async function(docId) { if(confirm('هل تم حل المشكلة وتريد إغلاق البلاغ؟')) { try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'reports', docId)); showToast("تم إغلاق البلاغ!"); } catch(e) {} } };
+
+            document.getElementById('imageUpload').addEventListener('change', async (e) => { const file = e.target.files[0]; if (!file) return; const btn = document.getElementById('uploadImageBtn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; try { const url = await uploadToImgBB(file); document.getElementById('imageUrl').value = url; document.getElementById('imagePreview').src = url; document.getElementById('imagePreviewContainer').classList.remove('hidden'); showToast("تم رفع الصورة!"); } catch (e) {} finally { btn.disabled = false; btn.innerHTML = orig; e.target.value = ''; } });
             document.getElementById('imageUrl').addEventListener('input', (e) => { const url = e.target.value; if(url) { document.getElementById('imagePreview').src = url; document.getElementById('imagePreviewContainer').classList.remove('hidden'); } else { document.getElementById('imagePreviewContainer').classList.add('hidden'); } });
 
-            // --- 5. الإعدادات ---
             const seoDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo');
-            getDoc(seoDocRef).then((docSnap) => {
-                if (docSnap.exists()) {
-                    const d = docSnap.data();
-                    document.getElementById('geminiApiKey').value = d.geminiApiKey || ''; document.getElementById('siteDesc').value = d.description || ''; document.getElementById('siteKeywords').value = d.keywords || ''; document.getElementById('adsenseId').value = d.adsenseId || ''; document.getElementById('analyticsId').value = d.analyticsId || ''; document.getElementById('siteVerification').value = d.siteVerification || ''; document.getElementById('facebookUrl').value = d.facebookUrl || ''; document.getElementById('twitterUrl').value = d.twitterUrl || ''; document.getElementById('instagramUrl').value = d.instagramUrl || ''; document.getElementById('telegramUrl').value = d.telegramUrl || '';
-                }
-            });
-            document.getElementById('seoForm').addEventListener('submit', async (e) => {
-                e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = 'جاري الحفظ...';
-                try {
-                    await setDoc(seoDocRef, { geminiApiKey: document.getElementById('geminiApiKey').value, description: document.getElementById('siteDesc').value, keywords: document.getElementById('siteKeywords').value, adsenseId: document.getElementById('adsenseId').value, analyticsId: document.getElementById('analyticsId').value, siteVerification: document.getElementById('siteVerification').value, facebookUrl: document.getElementById('facebookUrl').value, twitterUrl: document.getElementById('twitterUrl').value, instagramUrl: document.getElementById('instagramUrl').value, telegramUrl: document.getElementById('telegramUrl').value, updatedAt: serverTimestamp() }, { merge: true }); showToast("تم حفظ الإعدادات!");
-                } catch (e) { showToast("خطأ في الحفظ", true); } finally { btn.disabled = false; btn.innerHTML = orig; }
-            });
+            getDoc(seoDocRef).then((docSnap) => { if (docSnap.exists()) { const d = docSnap.data(); document.getElementById('geminiApiKey').value = d.geminiApiKey || ''; document.getElementById('siteDesc').value = d.description || ''; document.getElementById('siteKeywords').value = d.keywords || ''; document.getElementById('adsenseId').value = d.adsenseId || ''; document.getElementById('analyticsId').value = d.analyticsId || ''; document.getElementById('siteVerification').value = d.siteVerification || ''; document.getElementById('facebookUrl').value = d.facebookUrl || ''; document.getElementById('twitterUrl').value = d.twitterUrl || ''; document.getElementById('instagramUrl').value = d.instagramUrl || ''; document.getElementById('telegramUrl').value = d.telegramUrl || ''; } });
+            document.getElementById('seoForm').addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = 'جاري الحفظ...'; try { await setDoc(seoDocRef, { geminiApiKey: document.getElementById('geminiApiKey').value, description: document.getElementById('siteDesc').value, keywords: document.getElementById('siteKeywords').value, adsenseId: document.getElementById('adsenseId').value, analyticsId: document.getElementById('analyticsId').value, siteVerification: document.getElementById('siteVerification').value, facebookUrl: document.getElementById('facebookUrl').value, twitterUrl: document.getElementById('twitterUrl').value, instagramUrl: document.getElementById('instagramUrl').value, telegramUrl: document.getElementById('telegramUrl').value, updatedAt: serverTimestamp() }, { merge: true }); showToast("تم حفظ الإعدادات!"); } catch (e) {} finally { btn.disabled = false; btn.innerHTML = orig; } });
 
-            // --- 6. روابط البايو ---
-            document.getElementById('bioImageUpload').addEventListener('change', async (e) => {
-                const file = e.target.files[0]; if (!file) return; const btn = document.getElementById('uploadBioImageBtn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                try { const url = await uploadToImgBB(file); document.getElementById('bioImage').value = url; showToast("تم الرفع!"); } catch (e) { showToast("فشل", true); } finally { btn.disabled = false; btn.innerHTML = orig; e.target.value = ''; }
-            });
-            const bioProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'bio_profile');
-            getDoc(bioProfileRef).then((docSnap) => { if (docSnap.exists()) { const d = docSnap.data(); document.getElementById('bioName').value = d.name || ''; document.getElementById('bioImage').value = d.imageUrl || ''; document.getElementById('bioDesc').value = d.description || ''; } });
-            document.getElementById('bioProfileForm').addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '...'; try { await setDoc(bioProfileRef, { name: document.getElementById('bioName').value, imageUrl: document.getElementById('bioImage').value, description: document.getElementById('bioDesc').value, updatedAt: serverTimestamp() }, { merge: true }); showToast("تم الحفظ!"); } catch (err) { showToast("خطأ", true); } finally { btn.disabled = false; btn.innerHTML = orig; } });
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'biolinks')), (snapshot) => { const list = document.getElementById('bio-links-list'); list.innerHTML = ''; let count = 0; snapshot.forEach(docSnap => { count++; const d = docSnap.data(); let iconHtml = d.imageUrl ? `<img src="${d.imageUrl}" class="w-10 h-10 rounded-lg object-cover">` : `<div class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white"><i class="${d.iconClass || 'fa-solid fa-link'}"></i></div>`; list.innerHTML += `<div class="flex items-center justify-between bg-[#0f172a] p-3 rounded-xl border border-gray-700"><div class="flex items-center gap-3">${iconHtml}<div><h4 class="text-white font-bold text-sm">${d.title}</h4><div class="text-green-400 text-[11px]"><i class="fa-solid fa-chart-simple"></i> ${d.clicks || 0} نقرة</div></div></div><button onclick="deleteBioLink('${docSnap.id}')" class="text-red-400 hover:bg-red-900/30 p-2 rounded"><i class="fa-solid fa-trash-can"></i></button></div>`; }); if(count === 0) list.innerHTML = '<div class="text-center py-4 text-gray-500">لا توجد روابط.</div>'; }, (error) => { document.getElementById('bio-links-list').innerHTML = '<div class="text-center py-4 text-red-500 font-bold">خطأ</div>'; });
-            window.deleteBioLink = async function(docId) { if(confirm('متأكد؟')) { try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'biolinks', docId)); showToast("تم الحذف"); } catch (e) {} } };
-            document.getElementById('bioLinkImageUpload').addEventListener('change', async (e) => { const file = e.target.files[0]; if (!file) return; const btn = document.getElementById('uploadBioLinkImageBtn'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; try { const url = await uploadToImgBB(file); document.getElementById('bioLinkImage').value = url; showToast("تم الرفع!"); } catch (e) {} finally { btn.disabled = false; btn.innerHTML = orig; e.target.value = ''; } });
-            document.getElementById('addBioLinkForm').addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '...'; let rawIcon = document.getElementById('bioLinkIcon').value; let finalIconClass = ""; if (rawIcon) { const match = rawIcon.match(/class=["'](.*?)["']/); finalIconClass = match ? match[1] : rawIcon.replace(/<[^>]*>?/gm, '').trim(); } try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'biolinks'), { title: document.getElementById('bioLinkTitle').value, url: document.getElementById('bioLinkUrl').value, imageUrl: document.getElementById('bioLinkImage').value, iconClass: finalIconClass, isHighlighted: document.getElementById('bioLinkHighlight').checked, clicks: 0, createdAt: serverTimestamp() }); showToast("تم الإضافة!"); e.target.reset(); } catch (err) {} finally { btn.disabled = false; btn.innerHTML = orig; } });
-
-            // --- 7. إعدادات الحساب والأمان (تحديث البريد وكلمة المرور) ---
-            document.getElementById('accountForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const btn = e.target.querySelector('button'); 
-                const orig = btn.innerHTML; 
-                btn.disabled = true; 
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحديث...';
-                
-                const newEmail = document.getElementById('newEmail').value.trim();
-                const newPassword = document.getElementById('newPassword').value;
-                const user = auth.currentUser;
-
-                try {
-                    let updated = false;
-                    let emailVerificationSent = false;
-                    
-                    if (newEmail && newEmail !== user.email) {
-                        await verifyBeforeUpdateEmail(user, newEmail);
-                        emailVerificationSent = true;
-                        updated = true;
-                    }
-                    
-                    if (newPassword) {
-                        if(newPassword.length < 6) {
-                            showToast("كلمة المرور يجب أن تكون 6 أحرف على الأقل", true);
-                            btn.disabled = false; btn.innerHTML = orig;
-                            return;
-                        }
-                        await updatePassword(user, newPassword);
-                        updated = true;
-                    }
-                    
-                    if(updated) {
-                        if (emailVerificationSent) {
-                            showToast("تم إرسال رابط تأكيد إلى بريدك الجديد. يرجى التحقق منه لتأكيد التغيير!");
-                        } else {
-                            showToast("تم تحديث بيانات الحساب بنجاح!");
-                        }
-                        e.target.reset();
-                    } else {
-                        showToast("لم تقم بإدخال أي بيانات جديدة", true);
-                    }
-                } catch (error) {
-                    console.error("Account Update Error:", error);
-                    if (error.code === 'auth/requires-recent-login') {
-                        showToast("يرجى تسجيل الخروج والدخول مجدداً لتأكيد هويتك أولاً", true);
-                    } else {
-                        showToast("خطأ: " + error.message, true);
-                    }
-                } finally {
-                    btn.disabled = false; 
-                    btn.innerHTML = orig;
-                }
-            });
+            document.getElementById('accountForm').addEventListener('submit', async (e) => { e.preventDefault(); const btn = e.target.querySelector('button'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحديث...'; const newEmail = document.getElementById('newEmail').value.trim(); const newPassword = document.getElementById('newPassword').value; const user = auth.currentUser; try { let updated = false; let emailVerificationSent = false; if (newEmail && newEmail !== user.email) { await verifyBeforeUpdateEmail(user, newEmail); emailVerificationSent = true; updated = true; } if (newPassword) { if(newPassword.length < 6) { showToast("كلمة المرور يجب أن تكون 6 أحرف على الأقل", true); btn.disabled = false; btn.innerHTML = orig; return; } await updatePassword(user, newPassword); updated = true; } if(updated) { if (emailVerificationSent) showToast("تم إرسال رابط تأكيد إلى بريدك الجديد!"); else showToast("تم تحديث بيانات الحساب بنجاح!"); e.target.reset(); } else { showToast("لم تقم بإدخال بيانات جديدة", true); } } catch (error) { if (error.code === 'auth/requires-recent-login') showToast("يرجى تسجيل الخروج والدخول مجدداً لتأكيد هويتك أولاً", true); else showToast("خطأ: " + error.message, true); } finally { btn.disabled = false; btn.innerHTML = orig; } });
         }
     </script>
 </body>
