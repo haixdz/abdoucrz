@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صمم بطاقة تهنئة عيد الأضحى بصورتك - abdoucrz</title>
+    
+    <!-- Meta Tags -->
+    <meta property="og:title" content="صمم بطاقة تهنئة عيد الأضحى بصورتك مجاناً">
+    <meta property="og:description" content="أداة مجانية لتصميم بطاقات تهنئة العيد باسمك وصورتك لمشاركتها مع من تحب.">
+    <meta property="og:type" content="website">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- مكتبة الألوان الاحتفالية (Confetti) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Cairo', 'sans-serif'],
+                        ruqaa: ['Aref Ruqaa', 'serif'] 
+                    },
+                    colors: { primary: '#0ea5e9', dark: '#1e293b', gold: '#fbbf24' },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-delayed': 'float 5s ease-in-out infinite 2s',
+                        'pulse-gold': 'pulseGold 2s infinite',
+                        'shimmer': 'shimmer 3s linear infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-15px) rotate(5deg)' },
+                        },
+                        pulseGold: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(251, 191, 36, 0.4), inset 0 0 15px rgba(251, 191, 36, 0.2)', borderColor: 'rgba(251, 191, 36, 0.5)' },
+                            '50%': { boxShadow: '0 0 35px rgba(251, 191, 36, 0.9), inset 0 0 20px rgba(251, 191, 36, 0.5)', borderColor: '#fbbf24' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% center' },
+                            '100%': { backgroundPosition: '200% center' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+        .dark .glass-panel { background: rgba(30, 41, 59, 0.85); border-color: #334155; }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .glow-golden { animation: pulseGold 2s infinite; }
+
+        /* نص لامع متحرك */
+        .text-glow-animate {
+            background: linear-gradient(to right, #fde047 20%, #ffffff 40%, #fde047 60%, #ffffff 80%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        .dark .text-glow-animate {
+            background: linear-gradient(to right, #fbbf24 20%, #fef08a 40%, #fbbf24 60%, #fef08a 80%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- إضاءات خلفية حديثة (Glowing Orbs) -->
+    <div class="fixed top-[-10%] left-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-primary/20 dark:bg-primary/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-purple-500/20 dark:bg-purple-600/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+    <!-- شبكة خلفية خفيفة -->
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-5" style="background-image: radial-gradient(#0ea5e9 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+    <!-- الهيدر -->
+    <header class="glass-panel shadow-sm sticky top-0 z-40 transition-colors border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="index.html" class="flex items-center hover:opacity-80 transition-opacity">
+                        <img src="https://i.ibb.co/kgq5vmvH/crz.webp" alt="abdoucrz logo" class="h-12 md:h-14 object-contain dark:brightness-0 dark:invert">
+                    </a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="theme-toggle" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors">
+                        <i id="theme-toggle-dark-icon" class="fa-solid fa-moon hidden"></i>
+                        <i id="theme-toggle-light-icon" class="fa-solid fa-sun hidden"></i>
+                    </button>
+                    <a href="index.html" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
+                        <i class="fa-solid fa-house"></i> الرئيسية
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-8 relative z-10 flex flex-col items-center">
+        
+        <!-- زينة العيد المتحركة -->
+        <div class="absolute top-0 inset-x-0 w-full flex justify-around px-2 md:px-20 pointer-events-none z-0 h-64 opacity-60 dark:opacity-40">
+            <div class="text-gold text-5xl md:text-6xl animate-float mt-4 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]"><i class="fa-solid fa-moon"></i></div>
+            <div class="text-gold text-3xl md:text-4xl animate-float-delayed mt-16 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]"><i class="fa-solid fa-star"></i></div>
+            <div class="text-gold text-4xl md:text-5xl animate-float mt-8 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]"><i class="fa-solid fa-mosque"></i></div>
+        </div>
+
+        <!-- مساحة إعلانية علوية -->
+        <div class="w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-md border border-dashed border-gray-300 dark:border-gray-600 text-gray-400 rounded-2xl p-2 text-center h-24 flex flex-col justify-center items-center mb-10 shadow-sm relative z-10 max-w-4xl">
+            <span class="text-[11px] font-bold mb-1">إعلان - Advertisement</span>
+            <i class="fa-solid fa-rectangle-ad text-2xl opacity-50"></i>
+        </div>
+
+        <div class="text-center mb-10 relative z-10">
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 text-glow-animate drop-shadow-md pb-2">بطاقة تهنئة العيد بصورتك 🌙</h1>
+            <p class="text-gray-600 dark:text-gray-300 text-sm md:text-base font-bold max-w-lg mx-auto">صمم بطاقة تهنئة احترافية لعيد الأضحى المبارك بصورتك الشخصية بضغطة زر واحدة وشاركها مع أهلك وأصدقائك.</p>
+        </div>
+
+        <!-- لوحة التحكم في الأداة -->
+        <div class="w-full bg-white/80 dark:bg-gray-800/90 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/20 dark:border-gray-700 p-6 md:p-10 mb-8 transition-colors relative z-10">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                
+                <!-- قسم الأدوات والأزرار (يمين - 7 أعمدة) -->
+                <div class="lg:col-span-7 flex flex-col gap-8 order-2 lg:order-1 relative z-10">
+                    
+                    <!-- 1. اختيار التصميم (اللون) -->
+                    <div>
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                            <span class="bg-gradient-to-r from-primary to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">1</span> 
+                            اختر التصميم والألوان
+                        </h3>
+                        <div class="flex gap-3 overflow-x-auto pb-4 hide-scroll" id="design-selector">
+                            <button data-design="dark" class="design-btn flex-shrink-0 w-24 h-24 rounded-xl border-4 border-transparent ring-2 ring-transparent bg-[#0f172a] relative overflow-hidden transition-all hover:scale-105 active-design shadow-md">
+                                <div class="absolute inset-0 border-4 border-[#fde047] rounded-lg m-1 opacity-50"></div>
+                                <span class="absolute bottom-2 w-full text-center text-[11px] text-white font-bold drop-shadow-md">داكن ملكي</span>
+                                <div class="absolute top-2 right-2 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 check-icon shadow-sm"><i class="fa-solid fa-check"></i></div>
+                            </button>
+                            
+                            <button data-design="light" class="design-btn flex-shrink-0 w-24 h-24 rounded-xl border-4 border-transparent ring-2 ring-transparent bg-white shadow-inner relative overflow-hidden transition-all hover:scale-105">
+                                <div class="absolute inset-0 border-4 border-gray-300 rounded-lg m-1 opacity-50"></div>
+                                <span class="absolute bottom-2 w-full text-center text-[11px] text-gray-800 font-bold drop-shadow-sm">أبيض أنيق</span>
+                                <div class="absolute top-2 right-2 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 check-icon shadow-sm"><i class="fa-solid fa-check"></i></div>
+                            </button>
+
+                            <button data-design="green" class="design-btn flex-shrink-0 w-24 h-24 rounded-xl border-4 border-transparent ring-2 ring-transparent bg-[#064e3b] relative overflow-hidden transition-all hover:scale-105 shadow-md">
+                                <div class="absolute inset-0 border-4 border-[#a7f3d0] rounded-lg m-1 opacity-50"></div>
+                                <span class="absolute bottom-2 w-full text-center text-[11px] text-white font-bold drop-shadow-md">أخضر زمردي</span>
+                                <div class="absolute top-2 right-2 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 check-icon shadow-sm"><i class="fa-solid fa-check"></i></div>
+                            </button>
+
+                            <button data-design="purple" class="design-btn flex-shrink-0 w-24 h-24 rounded-xl border-4 border-transparent ring-2 ring-transparent bg-[#4c1d95] relative overflow-hidden transition-all hover:scale-105 shadow-md">
+                                <div class="absolute inset-0 border-4 border-[#fef08a] rounded-lg m-1 opacity-50"></div>
+                                <span class="absolute bottom-2 w-full text-center text-[11px] text-white font-bold drop-shadow-md">بنفسجي فاخر</span>
+                                <div class="absolute top-2 right-2 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 check-icon shadow-sm"><i class="fa-solid fa-check"></i></div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. اختيار شكل الإطار -->
+                    <div>
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                            <span class="bg-gradient-to-r from-primary to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">2</span> 
+                            اختر شكل قص الصورة
+                        </h3>
+                        <div class="flex gap-3" id="shape-selector">
+                            <button data-shape="circle" class="shape-btn flex-1 py-3 bg-blue-50 dark:bg-gray-700/50 text-blue-600 dark:text-blue-400 font-bold rounded-xl border-2 border-blue-400 dark:border-blue-500 transition-all active-shape">
+                                <i class="fa-regular fa-circle text-lg mb-1 block"></i> دائري
+                            </button>
+                            <button data-shape="dome" class="shape-btn flex-1 py-3 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+                                <i class="fa-solid fa-mosque text-lg mb-1 block"></i> قبة مسجد
+                            </button>
+                            <button data-shape="star" class="shape-btn flex-1 py-3 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+                                <i class="fa-solid fa-star-and-crescent text-lg mb-1 block"></i> نجمة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. رفع الصورة -->
+                    <div>
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                            <span class="bg-gradient-to-r from-primary to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">3</span> 
+                            ارفع صورتك السعيدة
+                        </h3>
+                        <div class="bg-blue-50/80 dark:bg-gray-700/50 rounded-2xl p-6 border-2 border-dashed border-blue-300 dark:border-gray-500 text-center relative hover:bg-blue-100/80 dark:hover:bg-gray-600/80 transition-all group cursor-pointer backdrop-blur-sm" onclick="document.getElementById('image-upload').click()">
+                            <input type="file" id="image-upload" accept="image/png, image/jpeg, image/webp" class="hidden">
+                            <div class="flex flex-col items-center gap-3 text-blue-500 dark:text-blue-400 group-hover:scale-105 transition-transform duration-300">
+                                <i class="fa-solid fa-camera-retro text-5xl drop-shadow-sm"></i>
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-white">اضغط لاختيار صورتك الشخصية</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">ستندمج صورتك في الإطار أوتوماتيكياً</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. الأزرار (تظهر بعد المعالجة) -->
+                    <div id="controls-section" class="hidden flex-col gap-4 animate-[fadeIn_0.5s_ease] mt-2 border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                            <span class="bg-gradient-to-r from-green-400 to-green-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">4</span> 
+                            جاهز للتحميل والمشاركة!
+                        </h3>
+                        <button id="download-btn" class="relative overflow-hidden w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-extrabold rounded-xl items-center justify-center gap-3 shadow-[0_10px_20px_rgba(34,197,94,0.3)] hover:shadow-[0_15px_25px_rgba(34,197,94,0.5)] transition-all text-xl flex transform hover:-translate-y-1">
+                            <span class="relative z-10 flex items-center gap-3"><i class="fa-solid fa-cloud-arrow-down fa-bounce"></i> تحميل البطاقة HD</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- قسم المعاينة (يسار - 5 أعمدة) -->
+                <div class="lg:col-span-5 flex flex-col items-center justify-center sticky top-24 order-1 lg:order-2">
+                    
+                    <!-- النبض الذهبي للإطار (.glow-golden) -->
+                    <div class="relative w-full max-w-[450px] aspect-square rounded-[2rem] overflow-hidden border-4 bg-gray-100 dark:bg-gray-800 flex items-center justify-center group transition-all duration-300 glow-golden z-10 shadow-2xl">
+                        
+                        <!-- Canvas مخفي للمعالجة (عالي الدقة) -->
+                        <canvas id="eid-canvas" width="1080" height="1080" class="hidden"></canvas>
+                        
+                        <!-- صورة المعاينة -->
+                        <img id="preview-image" src="https://images.unsplash.com/photo-1584260271510-727c62c050bc?w=500&auto=format&fit=crop&q=60" alt="معاينة" class="w-full h-full object-cover transition-opacity duration-500 relative z-10">
+                        
+                        <!-- تراكب الترحيب -->
+                        <div id="preview-overlay" class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white p-6 text-center backdrop-blur-sm transition-opacity duration-300 z-20">
+                            <i class="fa-solid fa-wand-magic-sparkles text-5xl text-gold mb-4 animate-pulse"></i>
+                            <h3 class="font-bold text-xl mb-2">أهلاً بك!</h3>
+                            <p class="text-sm opacity-90 leading-relaxed">اختر الشكل ثم ارفع صورتك لتشاهد السحر هنا.</p>
+                        </div>
+
+                    </div>
+                    <p class="text-xs text-gray-400 mt-4 text-center"><i class="fa-solid fa-circle-info"></i> جودة الصورة المحملة ستكون بدقة عالية (HD) ومناسبة للطباعة.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- مساحة إعلانية سفلية -->
+        <div class="w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-md border border-dashed border-gray-300 dark:border-gray-600 text-gray-400 rounded-2xl p-2 text-center min-h-[120px] flex flex-col justify-center items-center mb-8 shadow-sm relative z-10 max-w-4xl">
+            <span class="text-[11px] font-bold mb-1">إعلان - Advertisement</span>
+            <i class="fa-solid fa-rectangle-ad text-3xl opacity-50"></i>
+        </div>
+
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 mt-auto pt-8 pb-6 transition-colors relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm text-gray-500 dark:text-gray-400 font-semibold">© 2026 جميع الحقوق محفوظة لمدونة abdoucrz.</p>
+        </div>
+    </footer>
+
+    <!-- المؤثرات الصوتية المخفية -->
+    <audio id="sound-upload" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-download" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // إعداد Firebase 
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsCQ4Q1g1gzmwOx_9E3aE-eDncujAkK4A",
+            authDomain: "abdoucrz-dd234.firebaseapp.com",
+            projectId: "abdoucrz-dd234",
+            storageBucket: "abdoucrz-dd234.firebasestorage.app",
+            messagingSenderId: "305213328928",
+            appId: "1:305213328928:web:47136d037fbe88002af645"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'abdoucrz_blog';
+
+        // المتغيرات
+        const canvas = document.getElementById('eid-canvas');
+        const ctx = canvas.getContext('2d');
+        const fileInput = document.getElementById('image-upload');
+        const previewImage = document.getElementById('preview-image');
+        const previewOverlay = document.getElementById('preview-overlay');
+        const controlsSection = document.getElementById('controls-section');
+        const downloadBtn = document.getElementById('download-btn');
+        const designBtns = document.querySelectorAll('.design-btn');
+        const shapeBtns = document.querySelectorAll('.shape-btn');
+        const sndUpload = document.getElementById('sound-upload');
+        const sndDownload = document.getElementById('sound-download');
+
+        let currentDesign = 'dark'; 
+        let currentShape = 'circle';
+        let currentUploadedImageObj = null; 
+
+        // 1. نظام زخارف هندسية شفافة (Mandala Pattern)
+        function drawIslamicPattern(ctx, w, h) {
+            ctx.save();
+            ctx.strokeStyle = currentDesign === 'light' ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.04)';
+            ctx.lineWidth = 2;
+            const step = 100;
+            for(let x = 0; x < w + step; x += step) {
+                for(let y = 0; y < h + step; y += step) {
+                    ctx.strokeRect(x, y, step, step);
+                    ctx.beginPath();
+                    ctx.moveTo(x + step/2, y); ctx.lineTo(x + step, y + step/2);
+                    ctx.lineTo(x + step/2, y + step); ctx.lineTo(x, y + step/2);
+                    ctx.closePath(); ctx.stroke();
+                }
+            }
+            ctx.restore();
+        }
+
+        // 2. نظام أشكال إطارات معقدة (Circle, Dome, Star)
+        function buildShapePath(ctx, cx, cy, r, shape) {
+            ctx.beginPath();
+            if (shape === 'circle') {
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            } else if (shape === 'dome') {
+                ctx.moveTo(cx - r, cy + r); 
+                ctx.lineTo(cx + r, cy + r); 
+                ctx.lineTo(cx + r, cy - r * 0.2); 
+                ctx.quadraticCurveTo(cx + r, cy - r, cx, cy - r * 1.5); 
+                ctx.quadraticCurveTo(cx - r, cy - r, cx - r, cy - r * 0.2);
+            } else if (shape === 'star') {
+                const rot = Math.PI / 2 * 3;
+                let x, y;
+                const step = Math.PI / 8; // 16 نقاط لنجمة ثمانية
+                ctx.moveTo(cx, cy - r);
+                for (let i = 0; i < 16; i++) {
+                    x = cx + Math.cos(rot + i * step) * (i % 2 === 0 ? r : r * 0.75);
+                    y = cy + Math.sin(rot + i * step) * (i % 2 === 0 ? r : r * 0.75);
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.closePath();
+        }
+
+        // تحديث واجهة الأزرار (ألوان)
+        function updateDesignSelectionUI() {
+            designBtns.forEach(btn => {
+                btn.classList.remove('ring-primary', 'scale-105', 'border-primary');
+                btn.querySelector('.check-icon').style.opacity = '0';
+                if (btn.dataset.design === currentDesign) {
+                    btn.classList.add('ring-primary', 'scale-105', 'border-primary');
+                    btn.querySelector('.check-icon').style.opacity = '1';
+                }
+            });
+        }
+        
+        // تحديث واجهة الأزرار (أشكال)
+        function updateShapeSelectionUI() {
+            shapeBtns.forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'dark:bg-gray-700/50', 'text-blue-600', 'dark:text-blue-400', 'border-blue-400', 'dark:border-blue-500', 'active-shape');
+                btn.classList.add('bg-gray-50', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border-transparent');
+                
+                if (btn.dataset.shape === currentShape) {
+                    btn.classList.remove('bg-gray-50', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border-transparent');
+                    btn.classList.add('bg-blue-50', 'dark:bg-gray-700/50', 'text-blue-600', 'dark:text-blue-400', 'border-blue-400', 'dark:border-blue-500', 'active-shape');
+                }
+            });
+        }
+
+        updateDesignSelectionUI();
+        updateShapeSelectionUI();
+
+        designBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentDesign = btn.dataset.design;
+                updateDesignSelectionUI();
+                if (currentUploadedImageObj) drawCard(currentUploadedImageObj);
+            });
+        });
+
+        shapeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentShape = btn.dataset.shape;
+                updateShapeSelectionUI();
+                if (currentUploadedImageObj) drawCard(currentUploadedImageObj);
+            });
+        });
+
+        // دالة رسم البطاقة 
+        function drawCard(userImageObj) {
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2 + 70; 
+            const radius = 300; 
+
+            // مسح اللوحة
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. الخلفية
+            if (currentDesign === 'dark') {
+                const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+                bgGradient.addColorStop(0, '#0f172a'); bgGradient.addColorStop(1, '#1e293b');
+                ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
+            } else if (currentDesign === 'light') {
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
+                ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 10; ctx.strokeRect(30, 30, width - 60, height - 60);
+            } else if (currentDesign === 'green') {
+                const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+                bgGradient.addColorStop(0, '#064e3b'); bgGradient.addColorStop(1, '#022c22');
+                ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
+            } else if (currentDesign === 'purple') {
+                const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+                bgGradient.addColorStop(0, '#4c1d95'); bgGradient.addColorStop(1, '#2e1065');
+                ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
+            }
+
+            // رسم الزخرفة الهندسية الشفافة
+            drawIslamicPattern(ctx, width, height);
+
+            // 2. قص ودمج صورة المستخدم (بالشكل المختار)
+            ctx.save();
+            buildShapePath(ctx, centerX, centerY, radius, currentShape);
+            ctx.clip(); 
+
+            // حساب أبعاد الصورة لتغطي الشكل
+            const imgRatio = userImageObj.width / userImageObj.height;
+            let drawWidth = radius * 3; let drawHeight = radius * 3; // تكبير لتغطية القبة بالكامل
+            let drawX = centerX - (drawWidth/2); let drawY = centerY - (drawHeight/2);
+
+            if (imgRatio > 1) { drawWidth = drawHeight * imgRatio; drawX = centerX - (drawWidth / 2); } 
+            else { drawHeight = drawWidth / imgRatio; drawY = centerY - (drawHeight / 2); }
+
+            ctx.drawImage(userImageObj, drawX, drawY, drawWidth, drawHeight);
+            ctx.restore();
+
+            // 3. رسم إطار الشكل
+            buildShapePath(ctx, centerX, centerY, radius, currentShape);
+            if (currentDesign === 'dark' || currentDesign === 'green') {
+                ctx.lineWidth = 15;
+                const goldGradient = ctx.createLinearGradient(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+                goldGradient.addColorStop(0, '#fde047'); goldGradient.addColorStop(0.5, '#d97706'); goldGradient.addColorStop(1, '#fde047');
+                ctx.strokeStyle = goldGradient;
+            } else if (currentDesign === 'light') {
+                ctx.lineWidth = 15; ctx.strokeStyle = '#cbd5e1'; 
+            } else if (currentDesign === 'purple') {
+                ctx.lineWidth = 20; ctx.strokeStyle = '#fef08a'; 
+            }
+            ctx.stroke();
+
+            // 4. رسم النصوص والألوان (Glowing 3D)
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (currentDesign !== 'light') {
+                ctx.shadowColor = '#fde047'; ctx.shadowBlur = 30; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0; // توهج
+            } else {
+                ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 5; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 2;
+            }
+
+            ctx.font = 'bold 150px "Aref Ruqaa", serif'; 
+            if (currentDesign === 'dark') ctx.fillStyle = '#fde047';
+            else if (currentDesign === 'light') ctx.fillStyle = '#1e293b';
+            else if (currentDesign === 'green') ctx.fillStyle = '#a7f3d0';
+            else if (currentDesign === 'purple') ctx.fillStyle = '#fef08a';
+            ctx.fillText('عيد أضحى مبارك', width / 2, 160);
+
+            // نص سفلي
+            ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.font = 'bold 50px "Cairo", sans-serif';
+            if (currentDesign === 'light') { ctx.fillStyle = '#475569'; ctx.shadowColor = 'transparent'; }
+            else ctx.fillStyle = '#ffffff';
+            ctx.fillText('تقبل الله منا ومنكم صالح الأعمال', width / 2, height - 80);
+
+            // 5. العرض
+            previewImage.src = canvas.toDataURL('image/png');
+            previewOverlay.style.opacity = '0';
+            setTimeout(() => { previewOverlay.classList.add('hidden'); }, 300);
+            controlsSection.classList.remove('hidden');
+            controlsSection.classList.add('flex');
+            
+            document.querySelector('.glow-golden').classList.remove('glow-golden');
+        }
+
+        // معالجة اختيار الصورة + الصوت السحري
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.match('image.*')) { alert('يرجى اختيار صورة صالحة!'); return; }
+
+            // تشغيل صوت الرفع
+            sndUpload.currentTime = 0;
+            sndUpload.play().catch(e => console.log('Audio blocked by browser auto-play policy'));
+
+            const oldHtml = previewOverlay.innerHTML;
+            previewOverlay.classList.remove('hidden');
+            previewOverlay.style.opacity = '1';
+            previewOverlay.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-4xl text-white mb-3"></i><p>جاري سحر التصميم...</p>';
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    currentUploadedImageObj = img; 
+                    drawCard(img);
+                    previewOverlay.innerHTML = oldHtml; 
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // زر التحميل + تأثير الكونفيتي + الصوت
+        downloadBtn.addEventListener('click', function() {
+            // تشغيل صوت الاحتفال
+            sndDownload.currentTime = 0;
+            sndDownload.play().catch(e => console.log('Audio blocked'));
+
+            // تشغيل تأثير الاحتفال بالألوان (Confetti)
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+
+            // تحميل الصورة
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95); 
+            const link = document.createElement('a');
+            link.download = `بطاقة-تهنئة-${currentShape}-abdoucrz.jpg`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            const originalHtml = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<span class="relative z-10 flex items-center gap-3"><i class="fa-solid fa-check text-white"></i> تم تحميل بطاقتك الرائعة!</span>';
+            setTimeout(() => { downloadBtn.innerHTML = originalHtml; }, 4000);
+        });
+
+
+        // تهيئة Firebase وتتبع الزيارات
+        signInAnonymously(auth).then(async () => {
+            try {
+                const seoSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global_seo'));
+                if (seoSnap.exists()) {
+                    const d = seoSnap.data();
+                    if (d.adsenseId) {
+                        let adsScript = document.createElement('script'); adsScript.async = true; adsScript.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${d.adsenseId}`; adsScript.crossOrigin = "anonymous"; document.head.appendChild(adsScript);
+                    }
+                }
+            } catch (err) {}
+
+            try {
+                const today = new Date().toISOString().split('T')[0]; 
+                const globalRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'global_stats');
+                const dailyRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', today);
+                await setDoc(globalRef, { views: increment(1) }, { merge: true }); await setDoc(dailyRef, { views: increment(1) }, { merge: true });
+            } catch(e) {}
+        });
+
+        // الوضع الليلي
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden'); document.documentElement.classList.add('dark');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden'); document.documentElement.classList.remove('dark');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden'); themeToggleLightIcon.classList.toggle('hidden');
+            if (localStorage.getItem('color-theme') === 'light') { document.documentElement.classList.add('dark'); localStorage.setItem('color-theme', 'dark'); } 
+            else { document.documentElement.classList.remove('dark'); localStorage.setItem('color-theme', 'light'); }
+        });
+    </script>
+</body>
+</html>
