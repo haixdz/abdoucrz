@@ -62,7 +62,6 @@
         
         .glow-golden { animation: pulseGold 2s infinite; }
 
-        /* نص لامع متحرك */
         .text-glow-animate {
             background: linear-gradient(to right, #fde047 20%, #ffffff 40%, #fde047 60%, #ffffff 80%);
             background-size: 200% auto;
@@ -83,11 +82,46 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- إضاءات خلفية حديثة (Glowing Orbs) -->
+    <!-- تحميل مسبق للخطوط لضمان ظهور المخطوطة العربية من المرة الأولى -->
+    <div style="font-family: 'Aref Ruqaa', serif; font-weight: 700; position: absolute; visibility: hidden; top: -9999px; left: -9999px;">عيد أضحى مبارك عساكم من عواده كل عام وأنتم بخير</div>
+    <div style="font-family: 'Cairo', sans-serif; font-weight: 700; position: absolute; visibility: hidden; top: -9999px; left: -9999px;">تقبل الله منا ومنكم صالح الأعمال تهنئة من</div>
+
+    <!-- إضاءات خلفية (Glowing Orbs) وشبكة -->
     <div class="fixed top-[-10%] left-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-primary/20 dark:bg-primary/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
     <div class="fixed bottom-[-10%] right-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-purple-500/20 dark:bg-purple-600/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
-    <!-- شبكة خلفية خفيفة -->
     <div class="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-5" style="background-image: radial-gradient(#0ea5e9 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+    <!-- زر تكبيرات العيد (العائم) -->
+    <button id="takbeer-btn" class="fixed bottom-6 left-6 w-14 h-14 bg-gradient-to-tr from-gold to-yellow-600 text-white rounded-full shadow-[0_0_20px_rgba(251,191,36,0.6)] flex items-center justify-center text-2xl z-50 hover:scale-110 transition-transform border-2 border-white/20" title="تشغيل/إيقاف التكبيرات">
+        <i class="fa-solid fa-volume-xmark"></i>
+    </button>
+    <audio id="takbeer-audio" loop preload="none">
+        <!-- رابط تكبيرات العيد، يمكنك تغييره بأي رابط mp3 آخر إذا أردت -->
+        <source src="https://server11.mp3quran.net/eid/Eid_01.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- النافذة الفيروسية للمشاركة بعد التحميل -->
+    <div id="share-modal" class="fixed inset-0 bg-black/80 z-[60] hidden flex-col justify-center items-center backdrop-blur-md opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-800 rounded-[2rem] p-8 max-w-md w-full mx-4 text-center transform scale-95 transition-transform duration-300 relative shadow-2xl border border-white/10">
+            <button onclick="closeShareModal()" class="absolute top-4 left-4 text-gray-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            
+            <i class="fa-solid fa-face-grin-stars text-6xl text-gold mb-4 animate-bounce"></i>
+            <h3 class="text-2xl md:text-3xl font-extrabold text-gray-800 dark:text-white mb-2">بطاقتك أصبحت جاهزة! 🎉</h3>
+            <p class="text-gray-600 dark:text-gray-300 text-sm md:text-base font-semibold mb-6 leading-relaxed">
+                اكتمل التحميل بنجاح! شارك هذه الأداة المجانية مع عائلتك وأصدقائك عبر الواتساب ليصمموا بطاقاتهم أيضاً.
+            </p>
+            
+            <div class="flex justify-center gap-4 mb-2">
+                <button onclick="shareTo('whatsapp')" class="w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center text-3xl hover:scale-110 transition-transform shadow-[0_5px_15px_rgba(34,197,94,0.4)]" title="شارك عبر واتساب"><i class="fa-brands fa-whatsapp"></i></button>
+                <button onclick="shareTo('facebook')" class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl hover:scale-110 transition-transform shadow-[0_5px_15px_rgba(37,99,235,0.4)]" title="شارك عبر فيسبوك"><i class="fa-brands fa-facebook-f"></i></button>
+                <button onclick="shareTo('telegram')" class="w-14 h-14 rounded-full bg-sky-500 text-white flex items-center justify-center text-2xl hover:scale-110 transition-transform shadow-[0_5px_15px_rgba(14,165,233,0.4)]" title="شارك عبر تيليجرام"><i class="fa-brands fa-telegram"></i></button>
+                <button onclick="shareTo('copy')" class="w-14 h-14 rounded-full bg-gray-700 text-white flex items-center justify-center text-xl hover:scale-110 transition-transform shadow-[0_5px_15px_rgba(51,65,85,0.4)]" title="نسخ الرابط"><i class="fa-solid fa-link"></i></button>
+            </div>
+            
+            <!-- إشعار نسخ الرابط -->
+            <div id="modal-toast" class="text-green-500 font-bold text-sm mt-3 opacity-0 transition-opacity">تم نسخ الرابط!</div>
+        </div>
+    </div>
 
     <!-- الهيدر -->
     <header class="glass-panel shadow-sm sticky top-0 z-40 transition-colors border-b border-gray-200">
@@ -128,7 +162,7 @@
 
         <div class="text-center mb-10 relative z-10">
             <h1 class="text-3xl md:text-5xl font-extrabold mb-4 text-glow-animate drop-shadow-md pb-2">بطاقة تهنئة العيد بصورتك 🌙</h1>
-            <p class="text-gray-600 dark:text-gray-300 text-sm md:text-base font-bold max-w-lg mx-auto">صمم بطاقة تهنئة احترافية لعيد الأضحى المبارك بصورتك الشخصية بضغطة زر واحدة وشاركها مع أهلك وأصدقائك.</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm md:text-base font-bold max-w-lg mx-auto">صمم بطاقة تهنئة احترافية لعيد الأضحى المبارك باسمك وصورتك الشخصية بضغطة زر واحدة وشاركها مع أهلك وأصدقائك.</p>
         </div>
 
         <!-- لوحة التحكم في الأداة -->
@@ -139,7 +173,7 @@
                 <!-- قسم الأدوات والأزرار (يمين - 7 أعمدة) -->
                 <div class="lg:col-span-7 flex flex-col gap-8 order-2 lg:order-1 relative z-10">
                     
-                    <!-- 1. اختيار التصميم (اللون) -->
+                    <!-- 1. اختيار التصميم -->
                     <div>
                         <h3 class="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                             <span class="bg-gradient-to-r from-primary to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">1</span> 
@@ -179,22 +213,45 @@
                             اختر شكل قص الصورة
                         </h3>
                         <div class="flex gap-3" id="shape-selector">
-                            <button data-shape="circle" class="shape-btn flex-1 py-3 bg-blue-50 dark:bg-gray-700/50 text-blue-600 dark:text-blue-400 font-bold rounded-xl border-2 border-blue-400 dark:border-blue-500 transition-all active-shape">
+                            <button data-shape="circle" class="shape-btn flex-1 py-3 bg-blue-50 dark:bg-gray-700/50 text-blue-600 dark:text-blue-400 font-bold rounded-xl border-2 border-blue-400 dark:border-blue-500 transition-all active-shape shadow-sm">
                                 <i class="fa-regular fa-circle text-lg mb-1 block"></i> دائري
                             </button>
-                            <button data-shape="dome" class="shape-btn flex-1 py-3 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+                            <button data-shape="dome" class="shape-btn flex-1 py-3 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm">
                                 <i class="fa-solid fa-mosque text-lg mb-1 block"></i> قبة مسجد
                             </button>
-                            <button data-shape="star" class="shape-btn flex-1 py-3 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+                            <button data-shape="star" class="shape-btn flex-1 py-3 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-bold rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm">
                                 <i class="fa-solid fa-star-and-crescent text-lg mb-1 block"></i> نجمة
                             </button>
                         </div>
                     </div>
 
-                    <!-- 3. رفع الصورة -->
+                    <!-- 3. تخصيص النص والاسم (الميزة الجديدة) -->
                     <div>
                         <h3 class="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                             <span class="bg-gradient-to-r from-primary to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">3</span> 
+                            التهنئة والاسم
+                        </h3>
+                        <div class="flex flex-col gap-4">
+                            <select id="greeting-select" class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-primary font-bold shadow-sm transition-colors cursor-pointer">
+                                <option value="عيد أضحى مبارك">عيد أضحى مبارك</option>
+                                <option value="عساكم من عواده">عساكم من عواده</option>
+                                <option value="كل عام وأنتم بخير">كل عام وأنتم بخير</option>
+                                <option value="أضحى مبارك">أضحى مبارك</option>
+                            </select>
+                            
+                            <div class="relative">
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                    <i class="fa-solid fa-pen-fancy"></i>
+                                </div>
+                                <input type="text" id="user-name-input" placeholder="اكتب اسمك هنا (اختياري وسيظهر في البطاقة)" class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-600 rounded-xl pl-4 pr-12 py-3 focus:outline-none focus:border-primary font-bold shadow-sm transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. رفع الصورة -->
+                    <div>
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                            <span class="bg-gradient-to-r from-primary to-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">4</span> 
                             ارفع صورتك السعيدة
                         </h3>
                         <div class="bg-blue-50/80 dark:bg-gray-700/50 rounded-2xl p-6 border-2 border-dashed border-blue-300 dark:border-gray-500 text-center relative hover:bg-blue-100/80 dark:hover:bg-gray-600/80 transition-all group cursor-pointer backdrop-blur-sm" onclick="document.getElementById('image-upload').click()">
@@ -207,10 +264,10 @@
                         </div>
                     </div>
 
-                    <!-- 4. الأزرار (تظهر بعد المعالجة) -->
+                    <!-- 5. الأزرار (تظهر بعد المعالجة) -->
                     <div id="controls-section" class="hidden flex-col gap-4 animate-[fadeIn_0.5s_ease] mt-2 border-t border-gray-200 dark:border-gray-700 pt-6">
                         <h3 class="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
-                            <span class="bg-gradient-to-r from-green-400 to-green-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">4</span> 
+                            <span class="bg-gradient-to-r from-green-400 to-green-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-md">5</span> 
                             جاهز للتحميل والمشاركة!
                         </h3>
                         <button id="download-btn" class="relative overflow-hidden w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-extrabold rounded-xl items-center justify-center gap-3 shadow-[0_10px_20px_rgba(34,197,94,0.3)] hover:shadow-[0_15px_25px_rgba(34,197,94,0.5)] transition-all text-xl flex transform hover:-translate-y-1">
@@ -221,7 +278,7 @@
                 </div>
 
                 <!-- قسم المعاينة (يسار - 5 أعمدة) -->
-                <div class="lg:col-span-5 flex flex-col items-center justify-center sticky top-24 order-1 lg:order-2">
+                <div class="lg:col-span-5 flex flex-col items-center justify-center lg:sticky lg:top-24 relative order-1 lg:order-2">
                     
                     <!-- النبض الذهبي للإطار (.glow-golden) -->
                     <div class="relative w-full max-w-[450px] aspect-square rounded-[2rem] overflow-hidden border-4 bg-gray-100 dark:bg-gray-800 flex items-center justify-center group transition-all duration-300 glow-golden z-10 shadow-2xl">
@@ -236,7 +293,7 @@
                         <div id="preview-overlay" class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white p-6 text-center backdrop-blur-sm transition-opacity duration-300 z-20">
                             <i class="fa-solid fa-wand-magic-sparkles text-5xl text-gold mb-4 animate-pulse"></i>
                             <h3 class="font-bold text-xl mb-2">أهلاً بك!</h3>
-                            <p class="text-sm opacity-90 leading-relaxed">اختر الشكل ثم ارفع صورتك لتشاهد السحر هنا.</p>
+                            <p class="text-sm opacity-90 leading-relaxed">اختر الشكل والاسم ثم ارفع صورتك لتشاهد السحر هنا.</p>
                         </div>
 
                     </div>
@@ -298,8 +355,29 @@
         const downloadBtn = document.getElementById('download-btn');
         const designBtns = document.querySelectorAll('.design-btn');
         const shapeBtns = document.querySelectorAll('.shape-btn');
+        const greetingSelect = document.getElementById('greeting-select');
+        const userNameInput = document.getElementById('user-name-input');
+        
         const sndUpload = document.getElementById('sound-upload');
         const sndDownload = document.getElementById('sound-download');
+        
+        // نظام تكبيرات العيد
+        const takbeerBtn = document.getElementById('takbeer-btn');
+        const takbeerAudio = document.getElementById('takbeer-audio');
+        let isTakbeerPlaying = false;
+
+        takbeerBtn.addEventListener('click', () => {
+            if (isTakbeerPlaying) {
+                takbeerAudio.pause();
+                takbeerBtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+                takbeerBtn.classList.remove('animate-pulse');
+            } else {
+                takbeerAudio.play().catch(e => console.log('Audio blocked'));
+                takbeerBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                takbeerBtn.classList.add('animate-pulse');
+            }
+            isTakbeerPlaying = !isTakbeerPlaying;
+        });
 
         let currentDesign = 'dark'; 
         let currentShape = 'circle';
@@ -323,7 +401,7 @@
             ctx.restore();
         }
 
-        // 2. نظام أشكال إطارات معقدة (Circle, Dome, Star)
+        // 2. نظام أشكال إطارات معقدة 
         function buildShapePath(ctx, cx, cy, r, shape) {
             ctx.beginPath();
             if (shape === 'circle') {
@@ -348,7 +426,7 @@
             ctx.closePath();
         }
 
-        // تحديث واجهة الأزرار (ألوان)
+        // تحديث واجهة الأزرار (ألوان وأشكال)
         function updateDesignSelectionUI() {
             designBtns.forEach(btn => {
                 btn.classList.remove('ring-primary', 'scale-105', 'border-primary');
@@ -360,7 +438,6 @@
             });
         }
         
-        // تحديث واجهة الأزرار (أشكال)
         function updateShapeSelectionUI() {
             shapeBtns.forEach(btn => {
                 btn.classList.remove('bg-blue-50', 'dark:bg-gray-700/50', 'text-blue-600', 'dark:text-blue-400', 'border-blue-400', 'dark:border-blue-500', 'active-shape');
@@ -376,6 +453,7 @@
         updateDesignSelectionUI();
         updateShapeSelectionUI();
 
+        // مستمعات التغيير (الأزرار والحقول)
         designBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 currentDesign = btn.dataset.design;
@@ -391,93 +469,121 @@
                 if (currentUploadedImageObj) drawCard(currentUploadedImageObj);
             });
         });
+        
+        greetingSelect.addEventListener('change', () => {
+            if (currentUploadedImageObj) drawCard(currentUploadedImageObj);
+        });
+        
+        userNameInput.addEventListener('input', () => {
+            if (currentUploadedImageObj) drawCard(currentUploadedImageObj);
+        });
 
         // دالة رسم البطاقة 
-        function drawCard(userImageObj) {
+        async function drawCard(userImageObj) {
+            // إجبار المتصفح صراحة على تحميل الخطوط قبل الرسم لتجنب مشكلة الخط العادي
+            try {
+                await document.fonts.load('bold 140px "Aref Ruqaa"');
+                await document.fonts.load('bold 55px "Cairo"');
+            } catch(e) { console.error("Font loading error:", e); }
+
             const width = canvas.width;
             const height = canvas.height;
             const centerX = width / 2;
-            const centerY = height / 2 + 70; 
-            const radius = 300; 
+                const centerY = height / 2 + 50; // رفعناها قليلاً لترك مساحة للاسم
+                const radius = 290; 
 
-            // مسح اللوحة
-            ctx.clearRect(0, 0, width, height);
+                // مسح اللوحة
+                ctx.clearRect(0, 0, width, height);
 
-            // 1. الخلفية
-            if (currentDesign === 'dark') {
-                const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
-                bgGradient.addColorStop(0, '#0f172a'); bgGradient.addColorStop(1, '#1e293b');
-                ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
-            } else if (currentDesign === 'light') {
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
-                ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 10; ctx.strokeRect(30, 30, width - 60, height - 60);
-            } else if (currentDesign === 'green') {
-                const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
-                bgGradient.addColorStop(0, '#064e3b'); bgGradient.addColorStop(1, '#022c22');
-                ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
-            } else if (currentDesign === 'purple') {
-                const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-                bgGradient.addColorStop(0, '#4c1d95'); bgGradient.addColorStop(1, '#2e1065');
-                ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
+                // 1. الخلفية
+                if (currentDesign === 'dark') {
+                    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+                    bgGradient.addColorStop(0, '#0f172a'); bgGradient.addColorStop(1, '#1e293b');
+                    ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
+                } else if (currentDesign === 'light') {
+                    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
+                    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 10; ctx.strokeRect(30, 30, width - 60, height - 60);
+                } else if (currentDesign === 'green') {
+                    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+                    bgGradient.addColorStop(0, '#064e3b'); bgGradient.addColorStop(1, '#022c22');
+                    ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
+                } else if (currentDesign === 'purple') {
+                    const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+                    bgGradient.addColorStop(0, '#4c1d95'); bgGradient.addColorStop(1, '#2e1065');
+                    ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, width, height);
+                }
+
+                // رسم الزخرفة الهندسية
+                drawIslamicPattern(ctx, width, height);
+
+                // 2. قص ودمج صورة المستخدم
+                ctx.save();
+                buildShapePath(ctx, centerX, centerY, radius, currentShape);
+                ctx.clip(); 
+
+                const imgRatio = userImageObj.width / userImageObj.height;
+                let drawWidth = radius * 3; let drawHeight = radius * 3; 
+                let drawX = centerX - (drawWidth/2); let drawY = centerY - (drawHeight/2);
+
+                if (imgRatio > 1) { drawWidth = drawHeight * imgRatio; drawX = centerX - (drawWidth / 2); } 
+                else { drawHeight = drawWidth / imgRatio; drawY = centerY - (drawHeight / 2); }
+
+                ctx.drawImage(userImageObj, drawX, drawY, drawWidth, drawHeight);
+                ctx.restore();
+
+                // 3. رسم إطار الشكل
+                buildShapePath(ctx, centerX, centerY, radius, currentShape);
+                if (currentDesign === 'dark' || currentDesign === 'green') {
+                    ctx.lineWidth = 15;
+                    const goldGradient = ctx.createLinearGradient(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+                    goldGradient.addColorStop(0, '#fde047'); goldGradient.addColorStop(0.5, '#d97706'); goldGradient.addColorStop(1, '#fde047');
+                    ctx.strokeStyle = goldGradient;
+                } else if (currentDesign === 'light') {
+                    ctx.lineWidth = 15; ctx.strokeStyle = '#cbd5e1'; 
+                } else if (currentDesign === 'purple') {
+                    ctx.lineWidth = 20; ctx.strokeStyle = '#fef08a'; 
+                }
+                ctx.stroke();
+
+                // 4. رسم النصوص والألوان
+                const selectedGreeting = greetingSelect.value;
+                const userName = userNameInput.value.trim();
+                
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // إعدادات التوهج (Shadow/Glow) 3D
+                if (currentDesign !== 'light') {
+                    ctx.shadowColor = '#000000'; ctx.shadowBlur = 10; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 5; 
+                } else {
+                    ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 5; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 2;
+                }
+
+                // المخطوطة العلوية (التهنئة)
+                ctx.font = 'bold 140px "Aref Ruqaa", serif'; 
+                if (currentDesign === 'dark') ctx.fillStyle = '#fde047';
+                else if (currentDesign === 'light') ctx.fillStyle = '#1e293b';
+                else if (currentDesign === 'green') ctx.fillStyle = '#a7f3d0';
+                else if (currentDesign === 'purple') ctx.fillStyle = '#fef08a';
+                ctx.fillText(selectedGreeting, width / 2, 150);
+
+                // النص السفلي الأساسي
+                ctx.font = 'bold 40px "Cairo", sans-serif';
+                if (currentDesign === 'light') { ctx.fillStyle = '#475569'; ctx.shadowColor = 'transparent'; }
+                else { ctx.fillStyle = '#e2e8f0'; ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 8; }
+                
+                // تعديل ارتفاع النص بناءً على وجود الاسم من عدمه
+                const bottomTextY = userName ? height - 130 : height - 90;
+                ctx.fillText('تقبل الله منا ومنكم صالح الأعمال', width / 2, bottomTextY);
+
+                // رسم اسم المستخدم (إذا كان موجوداً)
+            if (userName) {
+                ctx.font = 'bold 55px "Cairo", sans-serif';
+                if (currentDesign === 'light') { ctx.fillStyle = '#0ea5e9'; }
+                else { ctx.fillStyle = '#fde047'; }
+                ctx.fillText(`تهنئة من: ${userName}`, width / 2, height - 60);
             }
-
-            // رسم الزخرفة الهندسية الشفافة
-            drawIslamicPattern(ctx, width, height);
-
-            // 2. قص ودمج صورة المستخدم (بالشكل المختار)
-            ctx.save();
-            buildShapePath(ctx, centerX, centerY, radius, currentShape);
-            ctx.clip(); 
-
-            // حساب أبعاد الصورة لتغطي الشكل
-            const imgRatio = userImageObj.width / userImageObj.height;
-            let drawWidth = radius * 3; let drawHeight = radius * 3; // تكبير لتغطية القبة بالكامل
-            let drawX = centerX - (drawWidth/2); let drawY = centerY - (drawHeight/2);
-
-            if (imgRatio > 1) { drawWidth = drawHeight * imgRatio; drawX = centerX - (drawWidth / 2); } 
-            else { drawHeight = drawWidth / imgRatio; drawY = centerY - (drawHeight / 2); }
-
-            ctx.drawImage(userImageObj, drawX, drawY, drawWidth, drawHeight);
-            ctx.restore();
-
-            // 3. رسم إطار الشكل
-            buildShapePath(ctx, centerX, centerY, radius, currentShape);
-            if (currentDesign === 'dark' || currentDesign === 'green') {
-                ctx.lineWidth = 15;
-                const goldGradient = ctx.createLinearGradient(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
-                goldGradient.addColorStop(0, '#fde047'); goldGradient.addColorStop(0.5, '#d97706'); goldGradient.addColorStop(1, '#fde047');
-                ctx.strokeStyle = goldGradient;
-            } else if (currentDesign === 'light') {
-                ctx.lineWidth = 15; ctx.strokeStyle = '#cbd5e1'; 
-            } else if (currentDesign === 'purple') {
-                ctx.lineWidth = 20; ctx.strokeStyle = '#fef08a'; 
-            }
-            ctx.stroke();
-
-            // 4. رسم النصوص والألوان (Glowing 3D)
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
             
-            if (currentDesign !== 'light') {
-                ctx.shadowColor = '#fde047'; ctx.shadowBlur = 30; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0; // توهج
-            } else {
-                ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 5; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 2;
-            }
-
-            ctx.font = 'bold 150px "Aref Ruqaa", serif'; 
-            if (currentDesign === 'dark') ctx.fillStyle = '#fde047';
-            else if (currentDesign === 'light') ctx.fillStyle = '#1e293b';
-            else if (currentDesign === 'green') ctx.fillStyle = '#a7f3d0';
-            else if (currentDesign === 'purple') ctx.fillStyle = '#fef08a';
-            ctx.fillText('عيد أضحى مبارك', width / 2, 160);
-
-            // نص سفلي
-            ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.font = 'bold 50px "Cairo", sans-serif';
-            if (currentDesign === 'light') { ctx.fillStyle = '#475569'; ctx.shadowColor = 'transparent'; }
-            else ctx.fillStyle = '#ffffff';
-            ctx.fillText('تقبل الله منا ومنكم صالح الأعمال', width / 2, height - 80);
-
             // 5. العرض
             previewImage.src = canvas.toDataURL('image/png');
             previewOverlay.style.opacity = '0';
@@ -485,7 +591,10 @@
             controlsSection.classList.remove('hidden');
             controlsSection.classList.add('flex');
             
-            document.querySelector('.glow-golden').classList.remove('glow-golden');
+            const glowEl = document.querySelector('.glow-golden');
+            if (glowEl) {
+                glowEl.classList.remove('glow-golden');
+            }
         }
 
         // معالجة اختيار الصورة + الصوت السحري
@@ -495,7 +604,6 @@
 
             if (!file.type.match('image.*')) { alert('يرجى اختيار صورة صالحة!'); return; }
 
-            // تشغيل صوت الرفع
             sndUpload.currentTime = 0;
             sndUpload.play().catch(e => console.log('Audio blocked by browser auto-play policy'));
 
@@ -517,13 +625,42 @@
             reader.readAsDataURL(file);
         });
 
-        // زر التحميل + تأثير الكونفيتي + الصوت
+        // دوال النافذة المنبثقة الفيروسية (Share Modal)
+        window.openShareModal = function() {
+            const m = document.getElementById('share-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10);
+        };
+        
+        window.closeShareModal = function() {
+            const m = document.getElementById('share-modal');
+            m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
+        };
+        
+        window.shareTo = function(platform) {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('صمم بطاقة تهنئة العيد بصورتك واسمك مجاناً من هنا! 🌙✨\n\n');
+            
+            if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${text}${url}`, '_blank');
+            else if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+            else if (platform === 'telegram') window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+            else if (platform === 'copy') {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    const toast = document.getElementById('modal-toast');
+                    toast.style.opacity = '1';
+                    setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+                });
+            }
+        };
+
+        // زر التحميل + تأثير الكونفيتي + الصوت + النافذة المنبثقة
         downloadBtn.addEventListener('click', function() {
-            // تشغيل صوت الاحتفال
+            
             sndDownload.currentTime = 0;
             sndDownload.play().catch(e => console.log('Audio blocked'));
 
-            // تشغيل تأثير الاحتفال بالألوان (Confetti)
             var duration = 3 * 1000;
             var animationEnd = Date.now() + duration;
             var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
@@ -541,7 +678,8 @@
             // تحميل الصورة
             const dataUrl = canvas.toDataURL('image/jpeg', 0.95); 
             const link = document.createElement('a');
-            link.download = `بطاقة-تهنئة-${currentShape}-abdoucrz.jpg`;
+            const safeName = userNameInput.value.trim() ? `-${userNameInput.value.trim().replace(/\s+/g, '-')}` : '';
+            link.download = `تهنئة-العيد${safeName}-abdoucrz.jpg`;
             link.href = dataUrl;
             document.body.appendChild(link);
             link.click();
@@ -549,9 +687,13 @@
             
             const originalHtml = downloadBtn.innerHTML;
             downloadBtn.innerHTML = '<span class="relative z-10 flex items-center gap-3"><i class="fa-solid fa-check text-white"></i> تم تحميل بطاقتك الرائعة!</span>';
-            setTimeout(() => { downloadBtn.innerHTML = originalHtml; }, 4000);
+            
+            // فتح نافذة المشاركة بعد ثانيتين من التحميل
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalHtml;
+                window.openShareModal();
+            }, 2000);
         });
-
 
         // تهيئة Firebase وتتبع الزيارات
         signInAnonymously(auth).then(async () => {
